@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+  @keyframes popin{0%{transform:scale(.7);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes confettiFall{0%{transform:translateY(-30px) rotate(0);opacity:1}100%{transform:translateY(620px) rotate(720deg);opacity:0}}
+  @keyframes shake{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-9px)}40%,60%{transform:translateX(9px)}}
+  @keyframes arrowbob{0%,100%{transform:translateY(0)}50%{transform:translateY(9px)}}
+  @keyframes pop{0%{transform:scale(.6)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+</style>
+</helmet>
+<div id="binary-deck" style="height:100vh;overflow-y:auto;scroll-snap-type:y proximity;scroll-behavior:smooth;background:linear-gradient(180deg,#fef6e4 0%,#eaf2ff 55%,#efeaff 100%);font-family:Nunito,sans-serif;color:#1f2544;">
+
+  <a href="Landing.dc.html" style="position:fixed;top:20px;left:20px;z-index:60;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#fff;color:#1f2544;font-family:Fredoka,sans-serif;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 6px 18px rgba(31,37,68,.18);">← Home</a>
+  <div style="position:fixed;bottom:13px;right:18px;z-index:60;pointer-events:none;font-family:Nunito,sans-serif;font-size:12px;color:#8a90ad;font-weight:600;">created by <span style="color:#2ec4b6;font-weight:800;">@chetandudhane</span></div>
+
+
+  <!-- CARD 1 : THE BIG PICTURE -->
+  <section style="min-height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:48px 24px;">
+    <div style="background:#fff;border-radius:32px;max-width:860px;width:100%;padding:48px 44px;box-shadow:0 24px 60px rgba(31,37,68,.12);position:relative;">
+      <div style="display:flex;gap:32px;align-items:center;flex-wrap:wrap;">
+        <div style="flex:0 0 auto;">{{ guideHello }}</div>
+        <div style="flex:1;min-width:260px;">
+          <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;color:#2ec4b6;font-size:14px;">LESSON 1 · HOW COMPUTERS THINK</div>
+          <h1 style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(30px,5vw,46px);line-height:1.08;margin:10px 0 14px;">Computers only know <span style="color:#ff6b6b;">two</span> things.</h1>
+          <p style="font-size:clamp(17px,2.4vw,20px);line-height:1.55;margin:0;color:#3b4263;">Hi, I'm <strong>Bit</strong>! No matter how smart a computer looks, deep down it only understands <strong>ON</strong> and <strong>OFF</strong> — just like a light switch. We write ON as <strong>1</strong> and OFF as <strong>0</strong>. Every game, song, and photo is built from just 1s and 0s!</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:20px;justify-content:center;margin-top:34px;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:96px;height:56px;border-radius:30px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 22px 4px rgba(255,206,58,.55);display:flex;align-items:center;justify-content:flex-end;padding:4px;"><div style="width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.15);"></div></div>
+          <div style="font-family:Fredoka,sans-serif;font-weight:600;">ON = <span style="color:#ff6b6b;font-size:20px;">1</span></div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+          <div style="width:96px;height:56px;border-radius:30px;background:#e7eaf3;border:4px solid #cfd5e6;display:flex;align-items:center;justify-content:flex-start;padding:4px;"><div style="width:44px;height:44px;border-radius:50%;background:#fff;box-shadow:0 2px 4px rgba(0,0,0,.12);"></div></div>
+          <div style="font-family:Fredoka,sans-serif;font-weight:600;color:#9aa3bd;">OFF = <span style="font-size:20px;">0</span></div>
+        </div>
+      </div>
+      <div style="text-align:center;margin-top:30px;font-family:Fredoka,sans-serif;color:#8a90ad;font-weight:500;">Scroll down to learn the secret code
+        <div style="font-size:26px;animation:arrowbob 1.4s ease-in-out infinite;">↓</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARD 2 : THE SECRET CODE -->
+  <section style="min-height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:48px 24px;">
+    <div style="background:#fff;border-radius:32px;max-width:860px;width:100%;padding:48px 44px;box-shadow:0 24px 60px rgba(31,37,68,.12);">
+      <div style="display:flex;gap:24px;align-items:center;flex-wrap:wrap;margin-bottom:8px;">
+        <div style="flex:0 0 auto;">{{ guideBulbs }}</div>
+        <div style="flex:1;min-width:240px;">
+          <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;color:#b96bff;font-size:14px;">THE SECRET CODE</div>
+          <h2 style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(26px,4.5vw,40px);margin:8px 0 12px;">5 magic lightbulbs</h2>
+          <p style="font-size:clamp(16px,2.3vw,19px);line-height:1.55;margin:0;color:#3b4263;">We line up 5 special bulbs. Each one is worth a different number. Turn a bulb <strong>ON</strong> to add its value — then add them all up!</p>
+        </div>
+      </div>
+      <div style="display:flex;gap:clamp(10px,2vw,18px);justify-content:center;margin-top:30px;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;"><div style="width:clamp(60px,12vw,82px);height:clamp(74px,15vw,98px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 22px 5px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(26px,5vw,36px);">16</div><div style="background:#1f2544;color:#fff;font-weight:800;padding:3px 12px;border-radius:999px;font-family:Fredoka,sans-serif;font-size:13px;">worth 16</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;"><div style="width:clamp(60px,12vw,82px);height:clamp(74px,15vw,98px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 22px 5px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(26px,5vw,36px);">8</div><div style="background:#1f2544;color:#fff;font-weight:800;padding:3px 12px;border-radius:999px;font-family:Fredoka,sans-serif;font-size:13px;">worth 8</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;"><div style="width:clamp(60px,12vw,82px);height:clamp(74px,15vw,98px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 22px 5px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(26px,5vw,36px);">4</div><div style="background:#1f2544;color:#fff;font-weight:800;padding:3px 12px;border-radius:999px;font-family:Fredoka,sans-serif;font-size:13px;">worth 4</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;"><div style="width:clamp(60px,12vw,82px);height:clamp(74px,15vw,98px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 22px 5px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(26px,5vw,36px);">2</div><div style="background:#1f2544;color:#fff;font-weight:800;padding:3px 12px;border-radius:999px;font-family:Fredoka,sans-serif;font-size:13px;">worth 2</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:10px;"><div style="width:clamp(60px,12vw,82px);height:clamp(74px,15vw,98px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 22px 5px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(26px,5vw,36px);">1</div><div style="background:#1f2544;color:#fff;font-weight:800;padding:3px 12px;border-radius:999px;font-family:Fredoka,sans-serif;font-size:13px;">worth 1</div></div>
+      </div>
+      <p style="text-align:center;margin:28px 0 0;font-family:Fredoka,sans-serif;color:#8a90ad;">The bulbs always go biggest → smallest. Add the ON ones to get your number!</p>
+    </div>
+  </section>
+
+  <!-- CARD 3 : EXAMPLE 5 -->
+  <section style="min-height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:48px 24px;">
+    <div style="background:#fff;border-radius:32px;max-width:860px;width:100%;padding:48px 44px;box-shadow:0 24px 60px rgba(31,37,68,.12);text-align:center;">
+      <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;color:#2ec4b6;font-size:14px;">EXAMPLE TIME</div>
+      <h2 style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(26px,4.5vw,40px);margin:8px 0 8px;">Let's build the number <span style="color:#ff6b6b;">5</span></h2>
+      <p style="font-size:clamp(16px,2.3vw,19px);color:#3b4263;margin:0 0 26px;">Which bulbs add up to 5? Turn on <strong>4</strong> and <strong>1</strong>!</p>
+      <div style="display:flex;gap:clamp(8px,1.8vw,16px);justify-content:center;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">16</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">8</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">4</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">2</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">1</div></div>
+      </div>
+      <div style="margin-top:26px;display:inline-block;background:#eaf2ff;border-radius:18px;padding:14px 28px;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(20px,3vw,26px);">4 + 1 = <span style="color:#2ec4b6;">5</span> ✓</div>
+    </div>
+  </section>
+
+  <!-- CARD 4 : EXAMPLE 12 -->
+  <section style="min-height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:48px 24px;">
+    <div style="background:#fff;border-radius:32px;max-width:860px;width:100%;padding:48px 44px;box-shadow:0 24px 60px rgba(31,37,68,.12);text-align:center;">
+      <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;color:#b96bff;font-size:14px;">ONE MORE EXAMPLE</div>
+      <h2 style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(26px,4.5vw,40px);margin:8px 0 8px;">Now let's build <span style="color:#ff6b6b;">12</span></h2>
+      <p style="font-size:clamp(16px,2.3vw,19px);color:#3b4263;margin:0 0 26px;">Turn on <strong>8</strong> and <strong>4</strong> — together they make 12!</p>
+      <div style="display:flex;gap:clamp(8px,1.8vw,16px);justify-content:center;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">16</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">8</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">4</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">2</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">1</div></div>
+      </div>
+      <div style="margin-top:26px;display:inline-block;background:#f3eaff;border-radius:18px;padding:14px 28px;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(20px,3vw,26px);">8 + 4 = <span style="color:#b96bff;">12</span> ✓</div>
+    </div>
+  </section>
+
+  <!-- CARD 4b : EXAMPLE 21 -->
+  <section style="min-height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:48px 24px;">
+    <div style="background:#fff;border-radius:32px;max-width:860px;width:100%;padding:48px 44px;box-shadow:0 24px 60px rgba(31,37,68,.12);text-align:center;">
+      <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;color:#ff6b6b;font-size:14px;">A BIGGER ONE</div>
+      <h2 style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(26px,4.5vw,40px);margin:8px 0 8px;">Let's build <span style="color:#ff6b6b;">21</span></h2>
+      <p style="font-size:clamp(16px,2.3vw,19px);color:#3b4263;margin:0 0 26px;">You can use three bulbs! Turn on <strong>16</strong>, <strong>4</strong> and <strong>1</strong>.</p>
+      <div style="display:flex;gap:clamp(8px,1.8vw,16px);justify-content:center;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">16</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">8</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">4</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">2</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">1</div></div>
+      </div>
+      <div style="margin-top:26px;display:inline-block;background:#ffeae4;border-radius:18px;padding:14px 28px;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(20px,3vw,26px);">16 + 4 + 1 = <span style="color:#ff6b6b;">21</span> ✓</div>
+    </div>
+  </section>
+
+  <!-- CARD 4c : EXAMPLE 25 -->
+  <section style="min-height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:48px 24px;">
+    <div style="background:#fff;border-radius:32px;max-width:860px;width:100%;padding:48px 44px;box-shadow:0 24px 60px rgba(31,37,68,.12);text-align:center;">
+      <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;color:#5b8def;font-size:14px;">YOU'VE GOT THIS</div>
+      <h2 style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(26px,4.5vw,40px);margin:8px 0 8px;">Last example: <span style="color:#5b8def;">25</span></h2>
+      <p style="font-size:clamp(16px,2.3vw,19px);color:#3b4263;margin:0 0 26px;">Turn on <strong>16</strong>, <strong>8</strong> and <strong>1</strong> to make 25.</p>
+      <div style="display:flex;gap:clamp(8px,1.8vw,16px);justify-content:center;flex-wrap:wrap;">
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">16</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">8</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">4</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#e7eaf3;border:4px solid #cfd5e6;color:#9aa3bd;display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">0</div><div style="font-weight:800;color:#9aa3bd;font-family:Fredoka,sans-serif;">2</div></div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:8px;"><div style="width:clamp(56px,11vw,76px);height:clamp(70px,14vw,92px);border-radius:18px;background:#fff3c4;border:4px solid #ffce3a;box-shadow:0 0 20px 4px rgba(255,206,58,.6);display:flex;align-items:center;justify-content:center;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(24px,5vw,34px);">1</div><div style="font-weight:800;color:#1f2544;font-family:Fredoka,sans-serif;">1</div></div>
+      </div>
+      <div style="margin-top:26px;display:inline-block;background:#eaf2ff;border-radius:18px;padding:14px 28px;font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(20px,3vw,26px);">16 + 8 + 1 = <span style="color:#5b8def;">25</span> ✓</div>
+    </div>
+  </section>
+
+  <!-- CARD 5 : YOUR TURN -->
+  <section style="min-height:100vh;scroll-snap-align:center;display:flex;align-items:center;justify-content:center;padding:48px 24px;">
+    <div style="background:linear-gradient(135deg,#2ec4b6,#5b8def);border-radius:32px;max-width:860px;width:100%;padding:54px 44px;box-shadow:0 24px 60px rgba(31,37,68,.18);text-align:center;color:#fff;">
+      <div style="display:flex;justify-content:center;margin-bottom:8px;">{{ guideReady }}</div>
+      <h2 style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(30px,5vw,46px);margin:6px 0 12px;">You're ready to play!</h2>
+      <p style="font-size:clamp(17px,2.5vw,20px);line-height:1.5;margin:0 auto 26px;max-width:560px;opacity:.95;">I'll show you a number. Light up the right bulbs to build it, then hit <strong>Check Answer</strong>. Let's crack some codes together!</p>
+      <button onClick="{{ scrollToGame }}" style="font-family:Fredoka,sans-serif;font-weight:600;font-size:20px;border:none;cursor:pointer;background:#fff;color:#1f2544;padding:16px 36px;border-radius:999px;box-shadow:0 8px 0 rgba(0,0,0,.15);" style-active="transform:translateY(4px);box-shadow:0 4px 0 rgba(0,0,0,.15);">Start the game ↓</button>
+    </div>
+  </section>
+
+  <!-- GAME -->
+  <section id="binary-game" style="min-height:100vh;scroll-snap-align:start;display:flex;align-items:center;justify-content:center;padding:48px 24px;position:relative;">
+    {{ confettiEl }}
+    <div style="background:#fff;border-radius:32px;max-width:760px;width:100%;padding:40px 36px 36px;box-shadow:0 24px 60px rgba(31,37,68,.14);position:relative;z-index:2;">
+      <div style="display:flex;align-items:center;justify-content:center;gap:18px;flex-wrap:wrap;">
+        <div style="transform:scale(.82);">{{ gameGuide }}</div>
+        <div style="text-align:center;">
+          <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1px;color:#8a90ad;font-size:14px;">BUILD THIS NUMBER</div>
+          <div style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(52px,12vw,84px);line-height:1;color:#1f2544;animation:pop .35s ease;">{{ target }}</div>
+        </div>
+      </div>
+
+      <div style="{{ rowStyle }}">
+        <sc-for list="{{ gameBulbs }}" as="b" hint-placeholder-count="5">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;">
+            <div onClick="{{ b.onClick }}" style="{{ b.boxStyle }}">
+              <div style="font-family:Fredoka,sans-serif;font-weight:600;font-size:clamp(30px,7vw,46px);">{{ b.digit }}</div>
+            </div>
+            <div style="background:#1f2544;color:#fff;font-weight:800;padding:4px 13px;border-radius:999px;font-family:Fredoka,sans-serif;font-size:14px;">{{ b.label }}</div>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{ showPlainFeedback }}" hint-placeholder-val="{{ true }}">
+        <div style="{{ feedbackStyle }}">{{ feedbackMsg }}</div>
+      </sc-if>
+
+      <sc-if value="{{ solved }}" hint-placeholder-val="{{ false }}">
+        <div style="margin-top:22px;background:#e3f9ef;border:3px solid #9be3c4;border-radius:22px;padding:20px 22px 24px;text-align:center;animation:popin .35s ease;">
+          <div style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(18px,2.8vw,23px);color:#1b8e6b;">🔓 You cracked the code!</div>
+          <div style="font-family:Nunito,sans-serif;font-weight:700;font-size:clamp(14px,2.2vw,16px);color:#3b4263;margin-top:3px;">Now here's the real secret — this is how a computer writes your number:</div>
+
+          <div style="display:flex;align-items:center;justify-content:center;gap:clamp(12px,4vw,28px);flex-wrap:wrap;margin-top:18px;">
+            <div style="display:flex;flex-direction:column;align-items:center;gap:7px;">
+              <div style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(42px,9vw,62px);color:#1f2544;line-height:1;">{{ target }}</div>
+              <div style="font-family:Fredoka,sans-serif;font-weight:600;font-size:12px;color:#8a90ad;letter-spacing:1px;">WHAT YOU SEE</div>
+            </div>
+            <div style="font-family:Fredoka,sans-serif;font-weight:700;font-size:clamp(34px,7vw,50px);color:#2ec4b6;">=</div>
+            <div style="display:flex;flex-direction:column;align-items:center;gap:7px;">
+              <div style="display:flex;gap:7px;">
+                <sc-for list="{{ binaryDigits }}" as="bd" hint-placeholder-count="5">
+                  <div style="{{ bd.style }}">{{ bd.d }}</div>
+                </sc-for>
+              </div>
+              <div style="font-family:Fredoka,sans-serif;font-weight:600;font-size:12px;color:#8a90ad;letter-spacing:1px;">WHAT THE COMPUTER SEES</div>
+            </div>
+          </div>
+
+          <div style="font-family:Nunito,sans-serif;font-weight:700;font-size:clamp(13px,2vw,15.5px);color:#3b4263;margin:18px auto 0;max-width:540px;line-height:1.55;">Every glowing bulb is a <strong style="color:#1b8e6b;">1</strong> and every dark bulb is a <strong>0</strong>. Read them in a row and you get <strong style="color:#1f2544;font-family:Fredoka,sans-serif;letter-spacing:1px;">{{ binaryStr }}</strong> — that's <strong>binary</strong>, the only language computers speak!</div>
+        </div>
+      </sc-if>
+
+      <div style="display:flex;gap:14px;justify-content:center;margin-top:24px;flex-wrap:wrap;">
+        <button onClick="{{ check }}" style="font-family:Fredoka,sans-serif;font-weight:600;font-size:20px;border:none;cursor:pointer;background:#2ec4b6;color:#fff;padding:15px 40px;border-radius:999px;box-shadow:0 6px 0 #1f9b8f;" style-active="transform:translateY(3px);box-shadow:0 3px 0 #1f9b8f;">Check Answer</button>
+        <sc-if value="{{ solved }}" hint-placeholder-val="{{ false }}">
+          <button onClick="{{ newNumber }}" style="font-family:Fredoka,sans-serif;font-weight:600;font-size:20px;border:none;cursor:pointer;background:#ff6b6b;color:#fff;padding:15px 36px;border-radius:999px;box-shadow:0 6px 0 #d8503f;" style-active="transform:translateY(3px);box-shadow:0 3px 0 #d8503f;">New Number →</button>
+        </sc-if>
+      </div>
+      <p style="text-align:center;margin:18px 0 0;color:#8a90ad;font-family:Fredoka,sans-serif;font-size:14px;">Tap a bulb to switch it on or off</p>
+    </div>
+  </section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;maxNumber&quot;:{&quot;editor&quot;:&quot;int&quot;,&quot;default&quot;:25,&quot;min&quot;:3,&quot;max&quot;:31,&quot;tsType&quot;:&quot;number&quot;},&quot;confetti&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = { target: 0, bulbs: [0,0,0,0,0], feedback: null, solved: false, confetti: [], shake: false };
+  values = [16,8,4,2,1];
+
+  componentDidMount() { this.newNumber(); this.installAudioUnlock(); }
+  componentWillUnmount() {
+    if (this._unlock) ['pointerdown','touchstart','mousedown','keydown'].forEach(ev =>
+      window.removeEventListener(ev, this._unlock));
+  }
+
+  // ---- audio ----
+  // Safari/iOS block Web Audio until it is created AND unlocked with a silent
+  // buffer INSIDE a real user gesture. We listen for the first tap anywhere and
+  // unlock there, so every later sound plays reliably.
+  installAudioUnlock() {
+    const unlock = () => {
+      this.ensureAudio();
+      const a = this.actx; if (!a) return;
+      try {
+        const b = a.createBuffer(1, 1, 22050);
+        const s = a.createBufferSource();
+        s.buffer = b; s.connect(a.destination); s.start(0);
+      } catch(e) {}
+      if (a.state === 'suspended') a.resume();
+    };
+    this._unlock = unlock;
+    ['pointerdown','touchstart','mousedown','keydown'].forEach(ev =>
+      window.addEventListener(ev, unlock, { passive: true }));
+  }
+  ensureAudio() {
+    if (!this.actx) { try { this.actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e) {} }
+    if (this.actx && this.actx.state === 'suspended') this.actx.resume();
+  }
+  beep(freq, start, dur, type, vol) {
+    const a = this.actx; if (!a) return;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    o.connect(g); g.connect(a.destination);
+    const t = a.currentTime + start;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(vol || 0.18, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.start(t); o.stop(t + dur + 0.03);
+  }
+  playClick() { this.beep(660, 0, 0.08, 'triangle', 0.12); }
+  playSuccess() { [523.25,659.25,783.99,1046.5].forEach((f,i)=>this.beep(f, i*0.13, 0.22, 'sine', 0.2)); }
+  playError() { this.beep(180, 0, 0.18, 'square', 0.16); this.beep(130, 0.16, 0.24, 'square', 0.16); }
+
+  // ---- game ----
+  maxN() { let m = this.props.maxNumber != null ? this.props.maxNumber : 25; m = Math.max(3, Math.min(31, m|0)); return m; }
+  newNumber() {
+    const max = this.maxN(); let n;
+    do { n = 1 + Math.floor(Math.random() * max); } while (n === this.state.target);
+    this.setState({ target: n, bulbs: [0,0,0,0,0], feedback: null, solved: false, confetti: [], shake: false });
+  }
+  toggle(i) {
+    if (this.state.solved) return;
+    this.ensureAudio(); this.playClick();
+    const bulbs = this.state.bulbs.slice(); bulbs[i] = bulbs[i] ? 0 : 1;
+    this.setState({ bulbs, feedback: null });
+  }
+  launchConfetti() {
+    if (this.props.confetti === false) return;
+    const cols = ['#ff6b6b','#ffd23f','#2ec4b6','#5b8def','#b96bff','#ff9f43'];
+    const pieces = [];
+    for (let i = 0; i < 80; i++) {
+      pieces.push({ left: Math.random()*100, bg: cols[i%cols.length], delay: Math.random()*0.5, dur: 1.8+Math.random()*1.4, size: 8+Math.random()*8, round: Math.random()>0.5 });
+    }
+    this.setState({ confetti: pieces });
+    clearTimeout(this._ct);
+    this._ct = setTimeout(() => this.setState({ confetti: [] }), 3200);
+  }
+  check() {
+    this.ensureAudio();
+    const lit = [], v = this.values; let sum = 0;
+    this.state.bulbs.forEach((b,i) => { if (b) { lit.push(v[i]); sum += v[i]; } });
+    if (sum === this.state.target) {
+      this.playSuccess(); this.launchConfetti();
+      this.setState({ solved: true, feedback: { type: 'success', msg: 'YES! ' + (lit.join(' + ') || '0') + ' = ' + this.state.target + '. You cracked the code!' } });
+    } else {
+      this.playError();
+      let msg;
+      if (lit.length === 0) msg = "You didn't light any bulbs, so that makes 0. We need " + this.state.target + " — try lighting some up!";
+      else msg = 'Oops! ' + lit.join(' + ') + ' = ' + sum + ', but we need ' + this.state.target + '. ' + (sum < this.state.target ? 'Light up a little more!' : "That's too much — turn some off!");
+      this.setState({ feedback: { type: 'error', msg }, shake: true });
+      clearTimeout(this._st);
+      this._st = setTimeout(() => this.setState({ shake: false }), 600);
+    }
+  }
+
+  // ---- cartoon robot ----
+  robot(mood, scale) {
+    const e = React.createElement, navy = '#1f2544';
+    const eye = (s) => e('div', { style: Object.assign({ width: 13, height: 13, borderRadius: '50%', background: navy }, s||{}) });
+    let mouth;
+    if (mood === 'celebrate') mouth = e('div', { style: { width: 20, height: 20, borderRadius: '50%', background: navy, marginTop: 6 } });
+    else if (mood === 'sad') mouth = e('div', { style: { width: 30, height: 16, border: '4px solid '+navy, borderBottom: 'none', borderRadius: '30px 30px 0 0', marginTop: 9 } });
+    else if (mood === 'happy') mouth = e('div', { style: { width: 34, height: 17, border: '4px solid '+navy, borderTop: 'none', borderRadius: '0 0 34px 34px', marginTop: 5 } });
+    else mouth = e('div', { style: { width: 22, height: 4, borderRadius: 4, background: navy, marginTop: 11 } });
+    const eyes = e('div', { style: { display: 'flex', gap: 16 } }, eye(), eye());
+    const face = e('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center' } }, eyes, mouth);
+    const antenna = e('div', { style: { position: 'relative', height: 16, display: 'flex', justifyContent: 'center' } },
+      e('div', { style: { width: 4, height: 13, background: '#1b8e83' } }),
+      e('div', { style: { position: 'absolute', top: -6, width: 13, height: 13, borderRadius: '50%', background: '#ffd23f', boxShadow: '0 0 10px rgba(255,210,63,.9)' } }));
+    const head = e('div', { style: { width: 98, height: 82, borderRadius: 24, background: 'linear-gradient(180deg,#3ad0c0,#22b3a6)', border: '4px solid #1b8e83', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: 'inset 0 -6px 0 rgba(0,0,0,.08)' } }, face);
+    const body = e('div', { style: { width: 72, height: 32, marginTop: -2, borderRadius: '0 0 18px 18px', background: 'linear-gradient(180deg,#ff8a5c,#ff6b6b)', border: '4px solid #e0533f', borderTop: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' } },
+      e('div', { style: { width: 30, height: 9, borderRadius: 6, background: 'rgba(255,255,255,.75)' } }));
+    return e('div', { style: { display: 'flex', flexDirection: 'column', alignItems: 'center', animation: 'floaty 3s ease-in-out infinite', width: 'fit-content', transform: scale ? 'scale('+scale+')' : 'none' } }, antenna, head, body);
+  }
+
+  renderVals() {
+    const e = React.createElement;
+    const labels = this.values, st = this.state;
+    const base = { width: 'clamp(64px,15vw,92px)', height: 'clamp(80px,18vw,112px)', borderRadius: 20, display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: st.solved ? 'default' : 'pointer', userSelect: 'none', transition: 'all .16s ease', borderWidth: 4, borderStyle: 'solid' };
+    const gameBulbs = labels.map((label, i) => {
+      const on = !!st.bulbs[i];
+      const boxStyle = Object.assign({}, base, on
+        ? { background: '#fff3c4', borderColor: '#ffce3a', color: '#1f2544', boxShadow: '0 0 28px 7px rgba(255,206,58,.75), inset 0 -4px 0 rgba(0,0,0,.05)' }
+        : { background: '#e7eaf3', borderColor: '#cfd5e6', color: '#9aa3bd', boxShadow: 'inset 0 -4px 0 rgba(0,0,0,.06)' });
+      return { label, digit: on ? '1' : '0', boxStyle, onClick: () => this.toggle(i) };
+    });
+
+    const rowStyle = { display: 'flex', gap: 'clamp(8px,2vw,16px)', justifyContent: 'center', flexWrap: 'wrap', margin: '30px 0 6px', animation: st.shake ? 'shake .5s' : 'none' };
+
+    const fb = st.feedback;
+    const feedbackStyle = fb ? (fb.type === 'success'
+      ? { marginTop: 22, background: '#e3f9ef', color: '#1b8e6b', border: '3px solid #9be3c4', borderRadius: 18, padding: '16px 22px', textAlign: 'center', fontFamily: 'Fredoka,sans-serif', fontWeight: 600, fontSize: 'clamp(17px,2.6vw,21px)', animation: 'popin .3s ease' }
+      : { marginTop: 22, background: '#ffeae4', color: '#c0392b', border: '3px solid #ffc3b5', borderRadius: 18, padding: '16px 22px', textAlign: 'center', fontFamily: 'Fredoka,sans-serif', fontWeight: 600, fontSize: 'clamp(16px,2.5vw,20px)', animation: 'popin .3s ease' })
+      : {};
+
+    const mood = st.solved ? 'celebrate' : (fb && fb.type === 'error' ? 'sad' : 'happy');
+
+    // binary reveal: each bulb in order IS a binary digit (1=on, 0=off)
+    const showPlainFeedback = !!fb && !st.solved;
+    const digitChip = (on) => ({
+      width: 'clamp(34px,7vw,50px)', height: 'clamp(44px,9vw,62px)', borderRadius: 12,
+      display: 'flex', alignItems: 'center', justifyContent: 'center',
+      fontFamily: 'Fredoka,sans-serif', fontWeight: 700, fontSize: 'clamp(22px,5vw,34px)', borderWidth: 3, borderStyle: 'solid',
+      ...(on
+        ? { background: '#fff3c4', borderColor: '#ffce3a', color: '#1f2544', boxShadow: '0 0 16px 3px rgba(255,206,58,.7)' }
+        : { background: '#eef0f6', borderColor: '#d3d9e8', color: '#aab2c8' })
+    });
+    const binaryDigits = st.bulbs.map((b) => ({ d: b ? '1' : '0', style: digitChip(!!b) }));
+    const binaryStr = st.bulbs.map((b) => (b ? '1' : '0')).join('');
+    const confettiEl = st.confetti.length
+      ? e('div', { style: { position: 'absolute', inset: 0, pointerEvents: 'none', overflow: 'hidden', zIndex: 5 } },
+          st.confetti.map((c, i) => e('div', { key: i, style: { position: 'absolute', top: -20, left: c.left + '%', width: c.size, height: c.size, background: c.bg, borderRadius: c.round ? '50%' : 2, animation: 'confettiFall ' + c.dur + 's ' + c.delay + 's ease-in forwards' } })))
+      : null;
+
+    return {
+      guideHello: this.robot('happy'),
+      guideBulbs: this.robot('neutral'),
+      guideReady: this.robot('celebrate'),
+      gameGuide: this.robot(mood),
+      target: st.target,
+      gameBulbs,
+      rowStyle,
+      feedback: !!fb,
+      showPlainFeedback,
+      binaryDigits,
+      binaryStr,
+      feedbackMsg: fb ? fb.msg : '',
+      feedbackStyle,
+      solved: st.solved,
+      confettiEl,
+      check: () => this.check(),
+      newNumber: () => this.newNumber(),
+      scrollToGame: () => { const c = document.getElementById('binary-deck'), el = document.getElementById('binary-game'); if (c && el) c.scrollTo({ top: el.offsetTop, behavior: 'smooth' }); }
+    };
+  }
+}
+</script>
+</body>
+</html>

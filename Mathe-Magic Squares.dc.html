@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  @keyframes floaty{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes popin{0%{transform:scale(.6);opacity:0}100%{transform:scale(1);opacity:1}}
+  @keyframes pop{0%{transform:scale(.7)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+  @keyframes twinkle{0%,100%{opacity:.2;transform:scale(.8)}50%{opacity:1;transform:scale(1.15)}}
+  @keyframes glowpulse{0%,100%{filter:brightness(1)}50%{filter:brightness(1.28)}}
+  @keyframes shake{10%,90%{transform:translateX(-3px)}20%,80%{transform:translateX(5px)}30%,50%,70%{transform:translateX(-8px)}40%,60%{transform:translateX(8px)}}
+  @keyframes confettiFall{0%{transform:translateY(-30px) rotate(0);opacity:1}100%{transform:translateY(680px) rotate(720deg);opacity:0}}
+  @keyframes arrowbob{0%,100%{transform:translate(0,0)}50%{transform:translate(4px,-4px)}}
+</style>
+</helmet>
+<div style="{{ rootStyle }}">
+
+  <a href="Landing.dc.html" style="position:fixed;top:20px;left:20px;z-index:60;display:inline-flex;align-items:center;gap:8px;padding:10px 18px;border-radius:999px;background:#fff;color:#1f2544;font-family:Fredoka,sans-serif;font-weight:600;font-size:15px;text-decoration:none;box-shadow:0 6px 18px rgba(31,37,68,.18);">← Home</a>
+
+  <div style="position:fixed;top:20px;right:20px;z-index:60;display:flex;gap:10px;">
+    <button onClick="{{ toggleSound }}" style="{{ soundBtnStyle }}">{{ soundLabel }}</button>
+  </div>
+
+  <div style="position:absolute;bottom:13px;right:18px;z-index:60;pointer-events:none;font-family:Nunito,sans-serif;font-size:12px;color:#8a90ad;font-weight:600;">created by <span style="color:#2ec4b6;font-weight:800;">@chetandudhane</span></div>
+
+  <div style="{{ cardStyle }}" ref="{{ cardRef }}">
+
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:4px;">
+      <sc-for list="{{ levels }}" as="l" hint-placeholder-count="3">
+        <button onClick="{{ l.onClick }}" style="{{ l.style }}">{{ l.label }}</button>
+      </sc-for>
+    </div>
+
+    <sc-if value="{{ showTopMascot }}" hint-placeholder-val="{{ true }}">
+    <div style="display:flex;gap:18px;align-items:center;justify-content:center;flex-wrap:wrap;margin-top:6px;">
+      <div style="flex:0 0 auto;">{{ wizard }}</div>
+      <div style="{{ bubbleStyle }}">
+        <div style="{{ bubbleTailStyle }}"></div>
+        {{ speech }}
+      </div>
+    </div>
+    </sc-if>
+
+    <div style="text-align:center;margin-top:4px;">
+      <div style="{{ eyebrowStyle }}">{{ eyebrowText }}</div>
+      <h1 style="{{ titleStyle }}">{{ titleText }}</h1>
+    </div>
+
+    <div style="{{ panelStyle }}">
+      <div style="position:absolute;inset:0;pointer-events:none;overflow:hidden;border-radius:26px;">
+        <div style="position:absolute;top:14%;left:10%;width:5px;height:5px;border-radius:50%;background:#fff;animation:twinkle 2.8s ease-in-out infinite;"></div>
+        <div style="position:absolute;top:22%;right:14%;width:4px;height:4px;border-radius:50%;background:#fff;animation:twinkle 3.3s ease-in-out infinite .5s;"></div>
+        <div style="position:absolute;bottom:18%;left:18%;width:4px;height:4px;border-radius:50%;background:#fff;animation:twinkle 3s ease-in-out infinite 1s;"></div>
+        <div style="position:absolute;bottom:26%;right:10%;width:6px;height:6px;border-radius:50%;background:#fff;animation:twinkle 2.6s ease-in-out infinite .3s;"></div>
+        <div style="position:absolute;top:46%;left:6%;width:3px;height:3px;border-radius:50%;background:#fff;animation:twinkle 3.5s ease-in-out infinite .8s;"></div>
+      </div>
+
+      <div style="position:relative;display:flex;flex-direction:column;align-items:center;gap:10px;">
+
+        <sc-if value="{{ showChooser }}" hint-placeholder-val="{{ false }}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:18px;padding:14px 0 8px;">
+            <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.4px;font-size:14px;color:#cdb9ff;">HOW BIG A SPELL?</div>
+            <div style="display:flex;gap:20px;justify-content:center;flex-wrap:wrap;">
+              <sc-for list="{{ sizeChoices }}" as="s" hint-placeholder-count="2">
+                <button onClick="{{ s.onClick }}" style="{{ s.style }}">
+                  <span style="{{ s.bigStyle }}">{{ s.big }}</span>
+                  <span style="{{ s.subStyle }}">{{ s.sub }}</span>
+                </button>
+              </sc-for>
+            </div>
+          </div>
+        </sc-if>
+
+        <sc-if value="{{ showBoard }}" hint-placeholder-val="{{ true }}">
+          <div style="display:flex;flex-direction:column;align-items:center;gap:10px;width:100%;">
+            <div style="{{ targetChipStyle }}">{{ targetChipText }}</div>
+
+            <div style="{{ boardWrapStyle }}">
+              <div style="{{ gridStyle }}">
+                <sc-for list="{{ cells }}" as="c" hint-placeholder-count="9">
+                  <div onClick="{{ c.onClick }}" style="{{ c.style }}">{{ c.text }}</div>
+                </sc-for>
+              </div>
+              <sc-if value="{{ showSums }}" hint-placeholder-val="{{ false }}">
+                <div style="{{ rowSumsStyle }}">
+                  <sc-for list="{{ rowSums }}" as="r" hint-placeholder-count="3">
+                    <div style="{{ r.style }}">{{ r.text }}</div>
+                  </sc-for>
+                </div>
+              </sc-if>
+              {{ calloutEl }}
+            </div>
+
+            <sc-if value="{{ showSums }}" hint-placeholder-val="{{ false }}">
+              <div style="{{ colSumsStyle }}">
+                <sc-for list="{{ colSums }}" as="k" hint-placeholder-count="3">
+                  <div style="{{ k.style }}">{{ k.text }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+
+            <sc-if value="{{ showNumberStrip }}" hint-placeholder-val="{{ false }}">
+              <div style="display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin-top:2px;">
+                <sc-for list="{{ numberStrip }}" as="n" hint-placeholder-count="9">
+                  <div style="{{ n.style }}">{{ n.value }}</div>
+                </sc-for>
+              </div>
+            </sc-if>
+          </div>
+        </sc-if>
+      </div>
+    </div>
+
+    <sc-if value="{{ showInventory }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:14px;text-align:center;">
+        <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;font-size:12px;color:#8a90ad;margin-bottom:8px;">{{ inventoryLabel }}</div>
+        <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;min-height:64px;align-items:center;">
+          <sc-for list="{{ inventory }}" as="t" hint-placeholder-count="3">
+            <div onClick="{{ t.onClick }}" style="{{ t.style }}">{{ t.value }}</div>
+          </sc-for>
+          <sc-if value="{{ inventoryEmpty }}" hint-placeholder-val="{{ false }}">
+            <div style="font-family:Nunito,sans-serif;font-size:14px;color:#b6bcd0;font-style:italic;">inventory empty</div>
+          </sc-if>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showSpellbook }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:12px;text-align:center;">
+        <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;font-size:12px;color:#8a90ad;margin-bottom:8px;">SPELLBOOK · PICK A MAGIC SUM</div>
+        <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap;">
+          <sc-for list="{{ spellbook }}" as="s" hint-placeholder-count="3">
+            <button onClick="{{ s.onClick }}" style="{{ s.style }}">{{ s.label }}</button>
+          </sc-for>
+        </div>
+      </div>
+    </sc-if>
+
+    <sc-if value="{{ showPlayRail }}" hint-placeholder-val="{{ false }}">
+      <div style="margin-top:14px;display:flex;flex-direction:column;align-items:center;gap:9px;">
+        <div style="font-family:Fredoka,sans-serif;font-weight:600;letter-spacing:1.5px;font-size:12px;color:#8a90ad;">{{ playRailLabel }}</div>
+        <div style="display:flex;align-items:center;gap:14px;">
+          <div style="{{ playCurrentStyle }}">{{ playCurrent }}</div>
+          <div style="font-family:Nunito,sans-serif;font-weight:700;font-size:15px;line-height:1.4;color:#3b4263;max-width:250px;text-align:left;">{{ playCaption }}</div>
+        </div>
+      </div>
+    </sc-if>
+
+    <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:16px;">
+      <sc-for list="{{ actions }}" as="a" hint-placeholder-count="1">
+        <button onClick="{{ a.onClick }}" style="{{ a.style }}">{{ a.label }}</button>
+      </sc-for>
+    </div>
+
+  </div>
+
+  {{ confettiEl }}
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;},&quot;sound&quot;:{&quot;editor&quot;:&quot;boolean&quot;,&quot;default&quot;:true,&quot;tsType&quot;:&quot;boolean&quot;}}">
+class Component extends DCLogic {
+  state = {
+    phase: 'learn',
+    learnStep: 0,
+    tick: 0,
+    sound: true,
+    scale: 1,
+    cardH: 0,
+    // hook (3x3)
+    g3: [],
+    revealed: 0,
+    inv3: [],
+    sel3: null,
+    solvedHook: false,
+    // apprentice (4x4)
+    factor: 1,
+    slot: null,        // current base-value sitting in the flawed cell (null = empty)
+    inv4: [],          // base-values currently in inventory
+    sel4: null,
+    solvedApp: false,
+    // code tutorial
+    codeStep: 0,
+    // code play
+    codeMode: 'tutorial',   // tutorial | choose | play
+    playSize: 3,
+    playGrid: [],
+    playNext: 1,
+    playSolved: false,
+    hintCell: null,
+    oops: 0,
+    oopsText: '',
+    // shared
+    maxLevel: 0,
+    confetti: [],
+    shake: false
+  };
+
+  cardRef = React.createRef();
+
+  // ----- constants -----
+  SOL3 = [4,9,2,3,5,7,8,1,6];
+  DEMO = [4,9,2,3,5,7,8,1,6];
+  BLANK3 = [0,4,8];
+  REVEAL3 = [1,2,3,5,6,7];
+  TARGET3 = 15;
+  BASE4 = [16,3,2,13, 5,10,11,8, 9,6,7,12, 4,15,14,1];
+  WRONG_IDX = 2;        // flawed cell
+  CORRECT4 = 2;         // true value there
+  WRONG4 = 13;          // wizard's mistake shown there
+  LINES3R = [[0,1,2],[3,4,5],[6,7,8]];
+  LINES3C = [[0,3,6],[1,4,7],[2,5,8]];
+  LINES3D = [[0,4,8],[2,4,6]];
+  LINES4R = [[0,1,2,3],[4,5,6,7],[8,9,10,11],[12,13,14,15]];
+  LINES4C = [[0,4,8,12],[1,5,9,13],[2,6,10,14],[3,7,11,15]];
+  LINES4D = [[0,5,10,15],[3,6,9,12]];
+  CODE = [
+    { to:1, blocked:false, note:'Start here! The 1 always goes in the top-middle box.' },
+    { to:8, blocked:false, note:'Now move UP and to the RIGHT. Off the top? Pop out the bottom!' },
+    { to:3, blocked:false, note:'Up and right again. Off the right side? Pop back on the left!' },
+    { to:6, blocked:true,  note:'That box is taken! When you are stuck, drop straight DOWN one box.' },
+    { to:4, blocked:false, note:'The path is clear — keep dancing up and to the right!' },
+    { to:2, blocked:false, note:'Up and to the right once more.' },
+    { to:5, blocked:true,  note:'Stuck again! Remember: drop straight DOWN one box.' },
+    { to:0, blocked:false, note:'Up and right, into the corner.' },
+    { to:7, blocked:false, note:'The last one! Now every row, column and line equals 15.' }
+  ];
+
+  componentDidMount() {
+    if (this.props.sound != null) this.setState({ sound: this.props.sound !== false });
+    this.setupHook();
+    this.setupApp();
+    this._tick = setInterval(() => this.setState(s => ({ tick: s.tick + 1 })), 1100);
+    this._onResize = () => this.fitScale();
+    window.addEventListener('resize', this._onResize);
+    setTimeout(() => this.fitScale(), 60);
+    this.installAudioUnlock();
+  }
+  // Safari/iOS block Web Audio until it is created AND unlocked with a silent
+  // buffer inside a real user gesture. Unlock on the first tap anywhere.
+  installAudioUnlock() {
+    const unlock = () => {
+      this.ensureAudio();
+      const a = this.actx; if (!a) return;
+      try { const b = a.createBuffer(1, 1, 22050); const s = a.createBufferSource(); s.buffer = b; s.connect(a.destination); s.start(0); } catch(e) {}
+      if (a.state === 'suspended') a.resume();
+    };
+    this._unlock = unlock;
+    ['pointerdown','touchstart','mousedown','keydown'].forEach(ev => window.addEventListener(ev, unlock, { passive: true }));
+  }
+  componentDidUpdate(prev) {
+    if (prev.props && prev.props.sound !== this.props.sound && this.props.sound != null)
+      this.setState({ sound: this.props.sound !== false });
+    this.fitScale();
+  }
+  fitScale() {
+    const el = this.cardRef && this.cardRef.current; if (!el) return;
+    // Lock the scale to the STARTING screen so the layout stays large and
+    // legible for kids, and keep that exact scale for every later screen —
+    // no rescaling as rows are added/removed (which caused jarring resizing).
+    // Only window resizes recompute, always against the locked starting height.
+    if (!this._fitH) this._fitH = el.offsetHeight;
+    const avail = window.innerHeight - 28;
+    let s = Math.max(0.5, Math.min(1, avail / this._fitH));
+    if (Math.abs(s - this.state.scale) > 0.004) this.setState({ scale: s });
+  }
+  componentWillUnmount() { clearInterval(this._rev); clearInterval(this._tick); clearTimeout(this._ct); clearTimeout(this._st); window.removeEventListener('resize', this._onResize); if (this._unlock) ['pointerdown','touchstart','mousedown','keydown'].forEach(ev => window.removeEventListener(ev, this._unlock)); }
+
+  LEARN_N = 3;
+  learnNext() { if (this.state.learnStep < this.LEARN_N - 1) { this.sSelect(); this.setState({ learnStep: this.state.learnStep + 1 }); } else this.goHook(); }
+  learnBack() { if (this.state.learnStep > 0) { this.sSelect(); this.setState({ learnStep: this.state.learnStep - 1 }); } }
+  goHook() { this.sSelect(); this.setState({ phase: 'hook' }); if (!this.state.solvedHook && this.state.revealed < this.REVEAL3.length) this.startReveal(); }
+  learnHi(step, tick) {
+    if (step === 0) {
+      const L = [
+        { idx:[0,1,2], label:'Row = 15' }, { idx:[3,4,5], label:'Row = 15' }, { idx:[6,7,8], label:'Row = 15' },
+        { idx:[0,3,6], label:'Column = 15' }, { idx:[1,4,7], label:'Column = 15' }, { idx:[2,5,8], label:'Column = 15' },
+        { idx:[0,4,8], label:'Diagonal = 15' }, { idx:[2,4,6], label:'Diagonal = 15' }
+      ];
+      return L[tick % L.length];
+    }
+    if (step === 1) {
+      const L = [ { idx:[3,4,5], label:'A ROW  \u2192' }, { idx:[1,4,7], label:'A COLUMN  \u2193' }, { idx:[0,4,8], label:'A DIAGONAL  \u2198' } ];
+      return L[tick % L.length];
+    }
+    const v = (tick % 9) + 1; const cell = this.DEMO.indexOf(v);
+    return { idx:[cell], label:'Using ' + v, num:v };
+  }
+
+  // ----- theme (Amethyst, finalized) -----
+  theme() {
+    return {
+      name:'Amethyst', accent:'#8b5cf6', accentD:'#6a3fd4', accentSoft:'#f1ebff',
+      table:'radial-gradient(120% 130% at 50% 0%,#2c2257 0%,#1c1440 62%,#140e2c 100%)',
+      tablet:'#2e2556', tabletBd:'#4c3f82', page:'radial-gradient(120% 90% at 50% -10%,#f3ecff 0%,#eaf2ff 50%,#efeaff 100%)'
+    };
+  }
+  GOLD = '#f5b831'; GOLD_GLOW = 'rgba(245,184,49,.65)'; GOLD_BD = '#d99a1e'; CREAM = '#fef6e3'; NAVY = '#241b46';
+
+  toggleSound() { this.setState({ sound: !this.state.sound }); }
+
+  // ----- audio -----
+  ensureAudio() {
+    if (!this.actx) { try { this.actx = new (window.AudioContext || window.webkitAudioContext)(); } catch(e){} }
+    if (this.actx && this.actx.state === 'suspended') this.actx.resume();
+  }
+  beep(freq, start, dur, type, vol) {
+    if (!this.state.sound) return;
+    const a = this.actx; if (!a) return;
+    const o = a.createOscillator(), g = a.createGain();
+    o.type = type || 'sine'; o.frequency.value = freq;
+    o.connect(g); g.connect(a.destination);
+    const t = a.currentTime + start;
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.linearRampToValueAtTime(vol || 0.16, t + 0.02);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.start(t); o.stop(t + dur + 0.03);
+  }
+  sSelect() { this.ensureAudio(); this.beep(720, 0, 0.07, 'triangle', 0.12); }
+  sPlace()  { this.ensureAudio(); this.beep(440, 0, 0.09, 'sine', 0.14); }
+  sChime()  { this.ensureAudio(); [784, 1046].forEach((f,i)=>this.beep(f, i*0.09, 0.18, 'sine', 0.15)); }
+  sWin()    { this.ensureAudio(); [523.25,659.25,783.99,1046.5,1318.5].forEach((f,i)=>this.beep(f, i*0.12, 0.26, 'sine', 0.2)); }
+  sErr()    { this.ensureAudio(); this.beep(180, 0, 0.16, 'square', 0.14); }
+
+  // ----- setup -----
+  buildPuzzles() {
+    // 8 symmetries of the Lo Shu magic square (all lines = 15)
+    this.SQUARES = [
+      [4,9,2,3,5,7,8,1,6],
+      [8,3,4,1,5,9,6,7,2],
+      [6,1,8,7,5,3,2,9,4],
+      [2,7,6,9,5,1,4,3,8],
+      [2,9,4,7,5,3,6,1,8],
+      [4,3,8,9,5,1,2,7,6],
+      [8,1,6,3,5,7,4,9,2],
+      [6,7,2,1,5,9,8,3,4]
+    ];
+    // 10 distinct blank patterns (which 3 stones the player fills)
+    this.PATTERNS = [
+      [0,4,8],[2,4,6],[1,4,7],[3,4,5],[0,2,8],
+      [0,5,7],[1,3,8],[2,3,6],[1,5,6],[0,4,5]
+    ];
+    this.PUZZLES = this.PATTERNS.map((bl,i) => ({ sol: this.SQUARES[i % this.SQUARES.length].slice(), blanks: bl.slice() }));
+  }
+  setupHook() {
+    if (!this.PUZZLES) this.buildPuzzles();
+    if (this._order == null) { this._order = this.shuffle(this.PUZZLES.map((_,i) => i)); this._ptr = 0; }
+    if (this._ptr >= this._order.length) {
+      // reshuffle for the next round of 10, avoiding an immediate repeat
+      const last = this._order[this._order.length - 1];
+      const no = this.shuffle(this.PUZZLES.map((_,i) => i));
+      if (no[0] === last) { const tmp = no[0]; no[0] = no[1]; no[1] = tmp; }
+      this._order = no; this._ptr = 0;
+    }
+    const p = this.PUZZLES[this._order[this._ptr]];
+    this.SOL3 = p.sol.slice();
+    this.BLANK3 = p.blanks.slice();
+    this.REVEAL3 = [];
+    for (let i=0;i<9;i++) if (this.BLANK3.indexOf(i) === -1) this.REVEAL3.push(i);
+    const g = new Array(9).fill(null);
+    this.SOL3.forEach((v,i) => { if (this.BLANK3.indexOf(i) === -1) g[i] = v; });
+    const inv = this.shuffle(this.BLANK3.map(i => this.SOL3[i]));
+    this.setState({ g3: g, inv3: inv, sel3: null, revealed: 0, solvedHook: false });
+  }
+  newPuzzle() {
+    this.sSelect();
+    this._ptr = (this._ptr == null ? 0 : this._ptr + 1);
+    this.setupHook();
+    this.startReveal();
+  }
+  buildApp4() {
+    // generate 10 distinct 4x4 magic squares (every row/col/diagonal = 34)
+    const rc = i => [Math.floor(i/4), i%4], fromRC = (r,c) => r*4+c;
+    const rot90 = sq => { const o = new Array(16); for (let i=0;i<16;i++){ const [r,c]=rc(i); o[fromRC(c,3-r)]=sq[i]; } return o; };
+    const flipH = sq => { const o = new Array(16); for (let i=0;i<16;i++){ const [r,c]=rc(i); o[fromRC(r,3-c)]=sq[i]; } return o; };
+    const comp  = sq => sq.map(v => 17-v);
+    const bases = [
+      [16,3,2,13, 5,10,11,8, 9,6,7,12, 4,15,14,1],
+      [1,8,13,12, 14,11,2,7, 4,5,16,9, 15,10,3,6]
+    ];
+    const out = [], seen = {};
+    bases.forEach(b => {
+      let s = b.slice();
+      for (let r=0;r<4;r++) {
+        [s, flipH(s)].forEach(v => { [v, comp(v)].forEach(w => { const k = w.join(','); if (!seen[k]) { seen[k]=1; out.push(w); } }); });
+        s = rot90(s);
+      }
+    });
+    this.APP_SQUARES = out.slice(0, 10);
+  }
+  setupApp() {
+    if (!this.APP_SQUARES) this.buildApp4();
+    if (this._aorder == null) { this._aorder = this.shuffle(this.APP_SQUARES.map((_,i) => i)); this._aptr = 0; }
+    if (this._aptr >= this._aorder.length) {
+      // reshuffle for the next round of 10, never repeating the puzzle just played
+      const last = this._aorder[this._aorder.length - 1];
+      const no = this.shuffle(this.APP_SQUARES.map((_,i) => i));
+      if (no[0] === last) { const tmp = no[0]; no[0] = no[1]; no[1] = tmp; }
+      this._aorder = no; this._aptr = 0;
+    }
+    const sol = this.APP_SQUARES[this._aorder[this._aptr]].slice();
+    const flaw = Math.floor(Math.random()*16);
+    const correct = sol[flaw];
+    // the wizard's "mistake": another number from the grid, so the flawed stone shows a duplicate clue
+    let j = Math.floor(Math.random()*16); if (j === flaw) j = (j+1)%16;
+    let wrong = sol[j];
+    if (wrong === correct) wrong = (correct % 16) + 1;
+    this.BASE4 = sol; this.WRONG_IDX = flaw; this.CORRECT4 = correct; this.WRONG4 = wrong;
+    this.setState({ slot: wrong, inv4: [correct], sel4: null, solvedApp: false });
+  }
+  startReveal() {
+    clearInterval(this._rev);
+    let i = 0;
+    this._rev = setInterval(() => {
+      i++; this.sPlace(); this.setState({ revealed: i });
+      if (i >= this.REVEAL3.length) clearInterval(this._rev);
+    }, 240);
+  }
+  shuffle(a) { a = a.slice(); for (let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); [a[i],a[j]]=[a[j],a[i]]; } return a; }
+  arrEq(a,b){ if(a.length!==b.length) return false; for(let i=0;i<a.length;i++) if(a[i]!==b[i]) return false; return true; }
+
+  // ----- glow / sums -----
+  glowSet(vals, lines, target) {
+    const set = {};
+    lines.forEach(ln => {
+      let s=0, full=true;
+      ln.forEach(i => { if (vals[i]==null) full=false; else s+=vals[i]; });
+      if (full && s===target) ln.forEach(i => set[i]=true);
+    });
+    return set;
+  }
+  lineSums(vals, lines, target) {
+    return lines.map(ln => {
+      let s=0, full=true;
+      ln.forEach(i => { if (vals[i]==null) full=false; else s+=vals[i]; });
+      return { text: full ? String(s) : '·', ok: full && s===target, full };
+    });
+  }
+
+  // ----- hook interaction -----
+  hookClick(idx) {
+    if (this.state.solvedHook) return;
+    if (this.state.revealed < this.REVEAL3.length) return;
+    if (this.BLANK3.indexOf(idx) === -1) return; // fixed
+    const g = this.state.g3.slice(), inv = this.state.inv3.slice(), sel = this.state.sel3;
+    const before = Object.keys(this.glowSet(g, this.LINES3R.concat(this.LINES3C, this.LINES3D), this.TARGET3)).length;
+    if (sel != null) {
+      const val = inv[sel]; inv.splice(sel,1);
+      if (g[idx] != null) inv.push(g[idx]);
+      g[idx] = val; this.sPlace();
+      this.setState({ g3: g, inv3: inv, sel3: null });
+    } else if (g[idx] != null) {
+      inv.push(g[idx]); g[idx] = null; this.sSelect();
+      this.setState({ g3: g, inv3: inv });
+      return;
+    } else return;
+    const after = Object.keys(this.glowSet(g, this.LINES3R.concat(this.LINES3C, this.LINES3D), this.TARGET3)).length;
+    if (this.arrEq(g, this.SOL3)) this.winHook();
+    else if (after > before) this.sChime();
+  }
+  winHook() {
+    this.sWin(); this.fireConfetti();
+    this.setState({ solvedHook: true, maxLevel: Math.max(this.state.maxLevel, 1) });
+  }
+
+  // ----- apprentice interaction -----
+  appClick(idx) {
+    if (this.state.solvedApp) return;
+    if (idx !== this.WRONG_IDX) return;
+    const inv = this.state.inv4.slice(), sel = this.state.sel4;
+    if (sel != null) {
+      const val = inv[sel]; inv.splice(sel,1);
+      if (this.state.slot != null) inv.push(this.state.slot);
+      this.sPlace();
+      this.setState({ slot: val, inv4: inv, sel4: null }, () => {
+        if (this.state.slot === this.CORRECT4) this.winApp(); else this.sChime();
+      });
+    } else if (this.state.slot != null) {
+      inv.push(this.state.slot); this.sSelect();
+      this.setState({ slot: null, inv4: inv });
+    }
+  }
+  winApp() {
+    this.sWin(); this.fireConfetti();
+    this.setState({ solvedApp: true, maxLevel: Math.max(this.state.maxLevel, 2) });
+  }
+  newApp() {
+    this.sSelect();
+    this._aptr = (this._aptr == null ? 0 : this._aptr + 1);
+    this.setupApp();
+    this.setState({ phase: 'apprentice' });
+  }
+  setSum(f) {
+    if (f === this.state.factor) return;
+    this.sSelect();
+    this.setState({ factor: f });
+  }
+
+  // ----- selection -----
+  selectTile(i) {
+    this.sSelect();
+    if (this.state.phase === 'hook') this.setState({ sel3: this.state.sel3 === i ? null : i });
+    else this.setState({ sel4: this.state.sel4 === i ? null : i });
+  }
+
+  // ----- nav -----
+  goto(phase) {
+    if (phase === 'apprentice' && this.state.maxLevel < 1) return;
+    if (phase === 'code' && this.state.maxLevel < 2) return;
+    this.sSelect();
+    if (phase === 'hook') { this.setState({ phase }); if (!this.state.solvedHook && this.state.revealed < this.REVEAL3.length) this.startReveal(); }
+    else if (phase === 'code') this.setState({ phase, codeMode: 'tutorial', codeStep: 0 });
+    else this.setState({ phase });
+  }
+  resetHook() { this.sSelect(); this.setupHook(); this.startReveal(); }
+
+  // ----- code tutorial -----
+  codeNext() {
+    if (this.state.codeStep >= this.CODE.length) { this.setState({ codeStep: 0 }); this.sSelect(); return; }
+    const step = this.state.codeStep + 1;
+    this.sPlace();
+    this.setState({ codeStep: step }, () => {
+      if (step === this.CODE.length) { this.sWin(); this.fireConfetti(); }
+    });
+  }
+
+  // ----- code: Siamese-method playground -----
+  siamese(n) {
+    const g = new Array(n*n).fill(0);
+    let r = 0, c = (n-1)/2;       // top-middle
+    for (let num=1; num<=n*n; num++) {
+      g[r*n+c] = num;
+      let nr = (r-1+n)%n, nc = (c+1)%n;   // up + right (wrap)
+      if (g[nr*n+nc] !== 0) { nr = (r+1)%n; nc = c; }  // blocked -> down
+      r = nr; c = nc;
+    }
+    return g;
+  }
+  chooseSize() { this.sSelect(); this.setState({ codeMode: 'choose' }); }
+  startPlay(size) {
+    this.sSelect();
+    const sol = this.siamese(size);
+    const pos = new Array(size*size + 1);
+    sol.forEach((num, idx) => { pos[num] = idx; });
+    this.playSol = sol; this.playPos = pos;
+    this.setState({ codeMode:'play', playSize:size, playGrid:new Array(size*size).fill(null), playNext:1, playSolved:false, hintCell:null, oops:0, oopsText:'' });
+  }
+  playAgain() { this.startPlay(this.state.playSize); }
+  ensurePlay() {
+    if (!this.playPos || this.playPos.length !== this.state.playSize*this.state.playSize + 1) {
+      const sol = this.siamese(this.state.playSize);
+      const pos = new Array(this.state.playSize*this.state.playSize + 1);
+      sol.forEach((num, idx) => { pos[num] = idx; });
+      this.playSol = sol; this.playPos = pos;
+    }
+  }
+  explainPlay(num, target) {
+    const N = this.state.playSize;
+    if (num === 1) return 'The 1 always starts in the top-middle box. Tap the glowing box!';
+    const prev = this.playPos[num-1], pr = Math.floor(prev/N), pc = prev%N;
+    const ur = (pr-1+N)%N, uc = (pc+1)%N;
+    if (ur*N+uc === target) return 'Oops! The ' + num + ' goes UP and to the RIGHT from the ' + (num-1) + '. Tap the glowing box!';
+    return 'Oops! That box was taken, so the ' + num + ' drops straight DOWN one box. Tap the glowing box!';
+  }
+  playClick(i) {
+    if (this.state.playSolved) return;
+    this.ensurePlay();
+    const N = this.state.playSize, num = this.state.playNext, target = this.playPos[num];
+    if (i === target) {
+      const g = this.state.playGrid.slice(); g[i] = num;
+      const next = num + 1;
+      if (next > N*N) { this.sWin(); this.fireConfetti(); this.setState({ playGrid:g, playSolved:true, hintCell:null, oops:0, oopsText:'' }); }
+      else { this.sPlace(); this.sChime(); this.setState({ playGrid:g, playNext:next, hintCell:null, oops:0, oopsText:'' }); }
+    } else {
+      this.sErr();
+      clearTimeout(this._st);
+      this.setState({ hintCell:target, oops:this.state.oops+1, oopsText:this.explainPlay(num, target), shake:true });
+      this._st = setTimeout(() => this.setState({ shake:false }), 500);
+    }
+  }
+
+  // ----- code: wizard callout that dances around the grid -----
+  buildCallout(o) {
+    const e = React.createElement, t = this.theme();
+    const N = o.N, col = o.cellIndex % N, row = Math.floor(o.cellIndex / N);
+    let cy = row*(o.cellSize+o.gap) + o.cellSize/2;
+    cy = Math.max(48, Math.min(o.W - 48, cy));
+    const onLeft = col <= (N-1)/2;
+    const Wc = 208;
+    const mini = e('div', { key:'m', style:{ zoom:0.56, flex:'0 0 auto' } }, this.wizard(o.mood));
+    const bubble = e('div', { key:'b', style:{ flex:'1 1 auto', minWidth:0, background:'#fff', border:'2px solid '+t.accent, borderRadius:15, padding:'9px 12px', fontFamily:'Nunito,sans-serif', fontWeight:700, fontSize:13.5, lineHeight:1.38, color:'#3b4263', boxShadow:'0 12px 28px rgba(20,14,40,.32)' } }, o.text);
+    const style = { position:'absolute', top:cy, width:Wc, transform:'translateY(-50%)', display:'flex', alignItems:'center', gap:6, zIndex:9, pointerEvents:'none', animation:'popin .32s ease' };
+    style.left = onLeft ? -(Wc + 12) : (o.W + 12);
+    return e('div', { key:o.ckey, style }, onLeft ? [bubble, mini] : [mini, bubble]);
+  }
+
+  // ----- confetti -----
+  fireConfetti() {
+    const cols = [this.GOLD, this.theme().accent, '#ff6b6b', '#5b8def', '#fff3c4', this.theme().accentD];
+    const pieces = [];
+    for (let i=0;i<90;i++) pieces.push({ left: Math.random()*100, bg: cols[i%cols.length], delay: Math.random()*0.5, dur: 1.8+Math.random()*1.4, size: 8+Math.random()*8, round: Math.random()>0.5 });
+    this.setState({ confetti: pieces });
+    clearTimeout(this._ct);
+    this._ct = setTimeout(() => this.setState({ confetti: [] }), 3400);
+  }
+
+  // ----- wizard mascot -----
+  wizard(mood, scale) {
+    const e = React.createElement, t = this.theme();
+    const accent = t.accent, accentD = t.accentD, gold = this.GOLD, cream = this.CREAM, navy = this.NAVY;
+    const star = e('div', { style:{ position:'absolute', top:-30, left:'50%', marginLeft:-9, color:gold, fontSize:18, textShadow:'0 0 8px '+this.GOLD_GLOW } }, '\u2726');
+    const hat = e('div', { style:{ position:'relative', width:0, height:0, borderLeft:'33px solid transparent', borderRight:'33px solid transparent', borderBottom:'56px solid '+accent } }, star,
+      e('div', { style:{ position:'absolute', top:40, left:-26, width:52, height:7, borderRadius:5, background:gold } }));
+    const brim = e('div', { style:{ width:82, height:13, borderRadius:8, background:accentD, marginTop:-3, boxShadow:'0 3px 6px rgba(0,0,0,.12)' } });
+    // eyes
+    const eye = () => e('div', { style:{ width:9, height:9, borderRadius:'50%', background:navy } });
+    let mouth;
+    if (mood === 'celebrate') mouth = e('div', { style:{ width:16, height:16, borderRadius:'50%', background:navy, marginTop:5 } });
+    else if (mood === 'sad') mouth = e('div', { style:{ width:24, height:13, border:'3px solid '+navy, borderBottom:'none', borderRadius:'24px 24px 0 0', marginTop:7 } });
+    else if (mood === 'thinking') mouth = e('div', { style:{ width:14, height:14, borderRadius:'50%', border:'3px solid '+navy, marginTop:5, marginLeft:8 } });
+    else if (mood === 'neutral') mouth = e('div', { style:{ width:18, height:3.5, borderRadius:4, background:navy, marginTop:9 } });
+    else mouth = e('div', { style:{ width:28, height:14, border:'3px solid '+navy, borderTop:'none', borderRadius:'0 0 28px 28px', marginTop:4 } });
+    const eyes = e('div', { style:{ display:'flex', gap:14 } }, eye(), eye());
+    const face = e('div', { style:{ width:66, height:60, marginTop:-2, borderRadius:'50% 50% 46% 46%', background:cream, border:'4px solid '+accentD, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' } }, eyes, mouth);
+    const beard = e('div', { style:{ width:50, height:20, marginTop:-8, background:cream, border:'4px solid '+accentD, borderTop:'none', borderRadius:'0 0 26px 26px' } });
+    const robe = e('div', { style:{ width:58, height:26, marginTop:-3, background:'linear-gradient(180deg,'+accent+','+accentD+')', borderRadius:'0 0 16px 16px', display:'flex', alignItems:'center', justifyContent:'center' } },
+      e('div', { style:{ width:10, height:10, borderRadius:'50%', background:gold, boxShadow:'0 0 7px '+this.GOLD_GLOW } }));
+    return e('div', { style:{ display:'flex', flexDirection:'column', alignItems:'center', animation:'floaty 3.4s ease-in-out infinite', width:'fit-content', transform: scale?'scale('+scale+')':'none' } }, hat, brim, face, beard, robe);
+  }
+
+  // ----- build cells for current phase -----
+  buildCells() {
+    const t = this.theme(), st = this.state;
+    const base = (size, fs) => ({ width:size, height:size, borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:fs, color:this.CREAM, background:t.tablet, border:'3px solid '+t.tabletBd, boxShadow:'inset 0 -4px 0 rgba(0,0,0,.28)', userSelect:'none', transition:'all .16s ease' });
+    const cells = [];
+
+    if (st.phase === 'learn') {
+      const size = 78, fs = 38;
+      const hi = this.learnHi(st.learnStep, st.tick);
+      const hiSet = {}; hi.idx.forEach(i => hiSet[i] = true);
+      for (let i=0;i<9;i++) {
+        const s = base(size, fs);
+        if (hiSet[i]) { s.borderColor=this.GOLD; s.color=this.GOLD; s.boxShadow='0 0 22px 3px '+this.GOLD_GLOW+', inset 0 0 12px rgba(245,184,49,.28)'; s.animation='glowpulse 1.2s ease-in-out infinite'; s.transform='scale(1.05)'; }
+        cells.push({ key:i, text:String(this.DEMO[i]), style:s, onClick: () => {} });
+      }
+      return cells;
+    }
+
+    if (st.phase === 'hook') {
+      const size = 78, fs = 38;
+      const glow = this.glowSet(st.g3, this.LINES3R.concat(this.LINES3C, this.LINES3D), this.TARGET3);
+      const allGlow = st.solvedHook;
+      for (let i=0;i<9;i++) {
+        const isBlank = this.BLANK3.indexOf(i) !== -1;
+        const revIdx = this.REVEAL3.indexOf(i);
+        const shown = isBlank ? true : (revIdx < st.revealed);
+        const val = st.g3[i];
+        const s = base(size, fs);
+        let text = '';
+        if (isBlank) {
+          if (val != null) { text = String(val); s.cursor='pointer'; }
+          else {
+            text = ''; s.background = 'rgba(0,0,0,.18)'; s.border = '3px dashed '+this.GOLD_BD; s.color = this.GOLD; s.cursor='pointer';
+            if (st.sel3 != null) { s.boxShadow = '0 0 0 3px '+this.GOLD_GLOW; s.borderColor = this.GOLD; }
+          }
+        } else {
+          text = shown ? String(val) : '';
+          if (!shown) { s.background = 'rgba(0,0,0,.12)'; s.color='transparent'; }
+          else s.animation = 'popin .35s ease';
+        }
+        if ((glow[i] || allGlow) && text !== '') {
+          s.borderColor = this.GOLD; s.color = this.GOLD;
+          s.boxShadow = '0 0 18px 2px '+this.GOLD_GLOW+', inset 0 0 12px rgba(245,184,49,.25)';
+          s.animation = 'glowpulse 1.7s ease-in-out infinite';
+        }
+        cells.push({ key:i, text, style:s, onClick: () => this.hookClick(i) });
+      }
+    } else if (st.phase === 'apprentice') {
+      const size = 62, fs = 27, f = st.factor;
+      const vals = this.BASE4.map(v => v*f); vals[this.WRONG_IDX] = st.slot==null ? null : st.slot*f;
+      const target = this.TARGET3>0 ? 34*f : 34*f;
+      const glow = this.glowSet(vals, this.LINES4R.concat(this.LINES4C, this.LINES4D), 34*f);
+      const allGlow = st.solvedApp;
+      for (let i=0;i<16;i++) {
+        const isFlaw = i === this.WRONG_IDX;
+        const s = base(size, fs);
+        let text = vals[i]==null ? '' : String(vals[i]);
+        if (isFlaw) {
+          s.cursor = 'pointer';
+          if (st.slot == null) { s.background='rgba(0,0,0,.18)'; s.border='3px dashed '+this.GOLD_BD; s.color=this.GOLD; if (st.sel4!=null){ s.boxShadow='0 0 0 3px '+this.GOLD_GLOW; s.borderColor=this.GOLD; } }
+          else if (!st.solvedApp) { s.border='3px solid #ff6b6b'; s.color='#ff9b8a'; s.boxShadow='0 0 14px 1px rgba(255,107,107,.45)'; }
+        }
+        if ((glow[i] || allGlow) && text !== '') {
+          s.borderColor = this.GOLD; s.color = this.GOLD;
+          s.boxShadow = '0 0 16px 2px '+this.GOLD_GLOW+', inset 0 0 10px rgba(245,184,49,.22)';
+          s.animation = 'glowpulse 1.7s ease-in-out infinite';
+        }
+        cells.push({ key:i, text, style:s, onClick: () => this.appClick(i) });
+      }
+    } else if (st.codeMode === 'play') {
+      const N = st.playSize, size = N===5?50:78, fs = N===5?24:36, done = st.playSolved;
+      for (let i=0;i<N*N;i++) {
+        const s = base(size, fs); s.borderRadius = N===5?11:14;
+        const v = st.playGrid[i];
+        let text = v!=null ? String(v) : '';
+        if (v==null) { s.background='rgba(0,0,0,.14)'; s.borderStyle='dashed'; s.borderColor='rgba(255,255,255,.18)'; s.cursor='pointer'; }
+        else { s.borderColor=this.GOLD; s.color=this.GOLD; s.boxShadow='0 0 14px 1px '+this.GOLD_GLOW+', inset 0 0 10px rgba(245,184,49,.22)'; s.animation='popin .3s ease'; }
+        if (i===st.hintCell && !done) { s.borderColor=this.GOLD; s.borderStyle='dashed'; s.color=this.GOLD; s.background='rgba(245,184,49,.14)'; s.boxShadow='0 0 24px 5px '+this.GOLD_GLOW; s.animation='glowpulse 1s ease-in-out infinite'; s.cursor='pointer'; }
+        if (done && v!=null) s.animation='glowpulse 1.7s ease-in-out infinite';
+        cells.push({ key:i, text, style:s, onClick: () => this.playClick(i) });
+      }
+    } else {
+      // code tutorial 3x3
+      const size = 78, fs = 36;
+      const placed = {};
+      for (let s=1;s<=st.codeStep;s++) placed[this.CODE[s-1].to] = s;
+      const curTo = st.codeStep>=1 && st.codeStep<=this.CODE.length ? this.CODE[st.codeStep-1].to : -1;
+      const done = st.codeStep >= this.CODE.length;
+      for (let i=0;i<9;i++) {
+        const s = base(size, fs);
+        const v = placed[i];
+        let text = v ? String(v) : '';
+        if (!v) { s.background='rgba(0,0,0,.14)'; s.borderStyle='dashed'; s.borderColor='rgba(255,255,255,.18)'; }
+        if (i === curTo) {
+          s.borderColor = this.GOLD; s.color = this.GOLD;
+          s.boxShadow = '0 0 20px 3px '+this.GOLD_GLOW; s.animation = 'pop .35s ease';
+        }
+        if (done && v) {
+          s.borderColor = this.GOLD; s.color = this.GOLD;
+          s.boxShadow = '0 0 16px 2px '+this.GOLD_GLOW; s.animation = 'glowpulse 1.7s ease-in-out infinite';
+        }
+        cells.push({ key:i, text, style:s, onClick: () => {} });
+      }
+    }
+    return cells;
+  }
+
+  renderVals() {
+    const e = React.createElement, t = this.theme(), st = this.state;
+    const accent = t.accent, accentD = t.accentD, gold = this.GOLD;
+
+    const rootStyle = { minHeight:'100vh', width:'100%', background:t.page, fontFamily:'Nunito,sans-serif', color:'#1f2544', display:'flex', alignItems:'center', justifyContent:'center', padding:'14px', position:'relative', boxSizing:'border-box' };
+    const cardStyle = { background:'#fff', borderRadius:28, width:'100%', maxWidth:840, padding:'20px 30px 24px', boxShadow:'0 24px 60px rgba(31,37,68,.14)', position:'relative', zIndex:2, transform:'scale('+st.scale+')', transformOrigin:'top center', marginBottom: st.cardH ? (-(st.cardH*(1-st.scale)))+'px' : 0 };
+
+    const panelStyle = { position:'relative', marginTop:12, background:t.table, borderRadius:24, padding:'16px 18px', boxShadow:'inset 0 2px 18px rgba(0,0,0,.45), 0 10px 30px rgba(20,14,40,.18)', overflow:'hidden', border:'1px solid rgba(255,255,255,.06)' };
+
+    // ----- levels stepper -----
+    const lvlDefs = [ {k:'learn', label:'Learn', num:0}, {k:'hook', label:'The Magic', num:1}, {k:'apprentice', label:'Find the Flaw', num:2}, {k:'code', label:'The Code', num:3} ];
+    const unlockedOf = (k) => (k==='learn'||k==='hook') ? true : (k==='apprentice' ? st.maxLevel>=1 : st.maxLevel>=2);
+    const solvedOf = (k) => (k==='hook'&&st.solvedHook) || (k==='apprentice'&&st.solvedApp);
+    const levels = lvlDefs.map((d) => {
+      const unlocked = unlockedOf(d.k);
+      const active = st.phase === d.k;
+      const base = { fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:13, padding:'7px 14px', borderRadius:999, border:'none', cursor: unlocked?'pointer':'default', transition:'all .15s ease', display:'inline-flex', alignItems:'center', gap:6 };
+      let s;
+      if (active) s = Object.assign(base, { background:accent, color:'#fff', boxShadow:'0 4px 12px rgba(139,92,246,.4)' });
+      else if (unlocked) s = Object.assign(base, { background:t.accentSoft, color:accentD });
+      else s = Object.assign(base, { background:'#eef0f6', color:'#b6bcd0' });
+      const chk = solvedOf(d.k) ? '\u2713 ' : '';
+      const lock = !unlocked ? '\u2727 ' : '';
+      const numTxt = d.num>0 ? (d.num + ' \u00b7 ') : '\u2726 ';
+      return { label: lock + chk + numTxt + d.label, style:s, onClick: () => this.goto(d.k) };
+    });
+
+    // ----- speech / header per phase -----
+    let mood = 'happy', speech = '', eyebrowText = '', titleText = '', titleAccentWord = '';
+    if (st.phase === 'learn') {
+      if (st.learnStep === 0) { eyebrowText='LESSON \u00b7 WHAT IS A MAGIC SQUARE?'; titleText='Every line is magic!'; speech='A magic square is a grid of numbers with a secret: every row, every column, and the two long diagonals ALL add up to the same number. Watch them glow!'; }
+      else if (st.learnStep === 1) { eyebrowText='LESSON \u00b7 THREE DIRECTIONS'; titleText='Rows, columns & diagonals'; speech='The magic works three ways: across each ROW, down each COLUMN, and corner-to-corner along each DIAGONAL. Every single one adds up to 15!'; }
+      else { eyebrowText='LESSON \u00b7 EACH NUMBER ONCE'; titleText='1 to 9, no repeats'; speech='A 3\u00d73 magic square uses the numbers 1 to 9 \u2014 and each number appears exactly once. Watch every one light up!'; }
+      mood = 'happy';
+    } else if (st.phase === 'hook') {
+      eyebrowText = 'STATE 1 \u00b7 THE 3\u00d73 ILLUSION';
+      if (st.solvedHook) { mood='celebrate'; titleText='Every line equals 15!'; speech="Magnificent, apprentice! Every row, column AND diagonal sings 15. You're ready for the 4\u00d74 hall."; }
+      else if (st.revealed < this.REVEAL3.length) { mood='thinking'; titleText='Make every line equal 15'; speech='Welcome, apprentice! Watch as I weave a spell where every row, column and diagonal equals exactly 15...'; }
+      else { mood='happy'; titleText='Make every line equal 15'; speech='Now YOU finish the spell! Tap a glowing number below, then tap an empty stone to place it. Every line must total 15.'; }
+    } else if (st.phase === 'apprentice') {
+      eyebrowText = 'STATE 2 \u00b7 THE APPRENTICE TRIAL';
+      const tgt = 34*st.factor;
+      if (st.solvedApp) { mood='celebrate'; titleText='Flaw repaired!'; speech='You spotted my mistake and fixed it! Every line equals '+tgt+' once more. What shall we do next?'; }
+      else { mood='thinking'; titleText='Find my mistake'; speech='I filled this 4\u00d74 spell myself... but I slipped in ONE wrong number! Find the flawed stone (it glows red), then swap in the correct number so every line equals '+tgt+'.'; }
+    } else {
+      eyebrowText = 'STATE 3 \u00b7 THE MAGICIAN\u2019S CODE';
+      if (st.codeMode === 'choose') { mood='happy'; titleText='Pick Your Grid'; }
+      else if (st.codeMode === 'play') { mood = st.playSolved ? 'celebrate' : 'happy'; titleText = st.playSolved ? 'You did it!' : 'Your Turn to Dance!'; }
+      else if (st.codeStep === 0) { mood='happy'; titleText='The Magic Dance'; }
+      else { mood= st.codeStep>=this.CODE.length ? 'celebrate':'thinking'; titleText='The Magic Dance'; }
+    }
+    const eyebrowStyle = { fontFamily:'Fredoka,sans-serif', fontWeight:600, letterSpacing:'1.5px', color:accent, fontSize:13 };
+    const titleStyle = { fontFamily:'Fredoka,sans-serif', fontWeight:700, fontSize:'clamp(22px,3.6vw,32px)', margin:'2px 0 0', lineHeight:1.06 };
+    const bubbleStyle = { position:'relative', flex:'1 1 320px', minWidth:240, maxWidth:520, background:t.accentSoft, border:'2px solid #ddd0fb', borderRadius:18, padding:'14px 18px', fontFamily:'Nunito,sans-serif', fontSize:'clamp(15px,2.1vw,17px)', lineHeight:1.5, color:'#3b4263', fontWeight:600 };
+    const bubbleTailStyle = { position:'absolute', left:-10, top:26, width:18, height:18, background:t.accentSoft, borderLeft:'2px solid #ddd0fb', borderBottom:'2px solid #ddd0fb', transform:'rotate(45deg)' };
+
+    // ----- target chip -----
+    let targetChipText = '', targetChipStyle = { display:'none' };
+    const chipBase = { fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:15, padding:'7px 18px', borderRadius:999, background:'rgba(245,184,49,.16)', color:gold, border:'1.5px solid rgba(245,184,49,.5)', letterSpacing:'.5px', whiteSpace:'nowrap' };
+    if (st.phase === 'learn') { targetChipText = this.learnHi(st.learnStep, st.tick).label; targetChipStyle = chipBase; }
+    else if (st.phase === 'hook') { targetChipText = 'Every line = 15'; targetChipStyle = chipBase; }
+    else if (st.phase === 'apprentice') { targetChipText = 'Every line = ' + (34*st.factor); targetChipStyle = chipBase; }
+    else if (st.codeMode === 'choose') { targetChipStyle = { display:'none' }; }
+    else if (st.codeMode === 'play') { targetChipText = st.playSolved ? 'Every line is magic!' : ('Place ' + st.playNext + ' of ' + (st.playSize*st.playSize)); targetChipStyle = chipBase; }
+    else { targetChipText = st.codeStep>=this.CODE.length ? 'Spell complete!' : 'Watch the dance...'; targetChipStyle = chipBase; }
+
+    // ----- board + sums -----
+    const cells = this.buildCells();
+    let cols, cellSize, gap = 10;
+    if (st.phase === 'apprentice') { cols = 4; cellSize = 62; }
+    else if (st.phase === 'code' && st.codeMode === 'play') { cols = st.playSize; cellSize = st.playSize===5?50:78; gap = st.playSize===5?9:10; }
+    else { cols = 3; cellSize = 78; }
+    const gridStyle = { display:'grid', gridTemplateColumns:'repeat('+cols+','+cellSize+'px)', gap:gap, animation: st.shake?'shake .5s':'none' };
+    const boardWrapStyle = { position:'relative', display:'flex', gap:gap, alignItems:'flex-start', justifyContent:'center' };
+
+    // ----- code-phase: chooser, moving callout, play rail -----
+    const showTopMascot = st.phase !== 'code';
+    const showChooser = st.phase === 'code' && st.codeMode === 'choose';
+    const showBoard = !showChooser;
+    let calloutEl = null;
+    if (st.phase === 'code') {
+      const W = cols*cellSize + (cols-1)*gap;
+      if (st.codeMode === 'tutorial') {
+        if (st.codeStep === 0) calloutEl = this.buildCallout({ cellIndex:1, N:cols, cellSize, gap, W, text:'Press \u201cBegin the Dance\u201d and watch me place every number!', mood:'happy', ckey:'t0' });
+        else if (st.codeStep <= this.CODE.length) { const cd = this.CODE[st.codeStep-1]; calloutEl = this.buildCallout({ cellIndex:cd.to, N:cols, cellSize, gap, W, text:cd.note, mood: st.codeStep>=this.CODE.length?'celebrate':(cd.blocked?'thinking':'happy'), ckey:'t'+st.codeStep }); }
+      } else if (st.codeMode === 'play' && !st.playSolved && st.oops>0 && st.hintCell!=null) {
+        calloutEl = this.buildCallout({ cellIndex:st.hintCell, N:cols, cellSize, gap, W, text:st.oopsText, mood:'sad', ckey:'o'+st.oops });
+      }
+    }
+    const sizeBtnBase = { fontFamily:'Fredoka,sans-serif', cursor:'pointer', border:'none', borderRadius:20, padding:'20px 32px', display:'flex', flexDirection:'column', alignItems:'center', gap:6, background:'#fff', boxShadow:'0 7px 0 '+accentD+', 0 16px 32px rgba(20,14,40,.28)' };
+    const sizeChoices = [ {size:3, big:'3 \u00d7 3', sub:'Starter \u00b7 numbers 1\u20139'}, {size:5, big:'5 \u00d7 5', sub:'Challenge \u00b7 numbers 1\u201325'} ].map(o => ({
+      big:o.big, sub:o.sub,
+      style: Object.assign({}, sizeBtnBase),
+      bigStyle: { fontFamily:'Fredoka,sans-serif', fontWeight:700, fontSize:36, lineHeight:1, color:accent },
+      subStyle: { fontFamily:'Nunito,sans-serif', fontWeight:700, fontSize:13, color:'#8a90ad' },
+      onClick: () => this.startPlay(o.size)
+    }));
+    const showPlayRail = st.phase === 'code' && st.codeMode === 'play' && !st.playSolved;
+    const playRailLabel = 'FOLLOW THE DANCE \u00b7 TAP WHERE THE NUMBER GOES';
+    const playCurrent = st.playNext;
+    const playCurrentStyle = { width:58, height:62, borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:30, color:this.NAVY, background:'linear-gradient(180deg,#ffe49a,#f5b831)', border:'3px solid '+this.GOLD_BD, boxShadow:'0 0 16px '+this.GOLD_GLOW, animation:'pop .4s ease' };
+    const playCaption = st.oops>0 ? 'Look for the glowing box \u2014 that is where it belongs!' : (st.playNext===1 ? 'Start in the top-middle box!' : 'Tap where the ' + st.playNext + ' should go.');
+
+    const showSums = st.phase !== 'code';
+    let rowSums = [], colSums = [], rowSumsStyle = { display:'none' }, colSumsStyle = { display:'none' };
+    if (showSums) {
+      const sumChip = (r) => ({ width: cellSize, height: cellSize, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:16, borderRadius:12, color: r.ok?this.NAVY:'#cdb9ff', background: r.ok?gold:'rgba(255,255,255,.06)', border: r.ok?('2px solid '+this.GOLD_BD):'1.5px solid rgba(255,255,255,.12)', boxShadow: r.ok?('0 0 14px '+this.GOLD_GLOW):'none', transition:'all .2s ease' });
+      let vals, linesR, linesC, target;
+      if (st.phase === 'hook') { vals = st.g3; linesR = this.LINES3R; linesC = this.LINES3C; target = this.TARGET3; }
+      else if (st.phase === 'learn') { vals = this.DEMO; linesR = this.LINES3R; linesC = this.LINES3C; target = this.TARGET3; }
+      else { const f=st.factor; vals = this.BASE4.map(v=>v*f); vals[this.WRONG_IDX] = st.slot==null?null:st.slot*f; linesR = this.LINES4R; linesC = this.LINES4C; target = 34*f; }
+      rowSums = this.lineSums(vals, linesR, target).map(r => ({ text:r.text, style: sumChip(r) }));
+      colSums = this.lineSums(vals, linesC, target).map(r => ({ text:r.text, style: sumChip(r) }));
+      rowSumsStyle = { display:'grid', gridTemplateRows:'repeat('+cols+','+cellSize+'px)', gap:gap };
+      colSumsStyle = { display:'grid', gridTemplateColumns:'repeat('+cols+','+cellSize+'px)', gap:gap, marginLeft: -(cellSize+gap) >= 0 ? 0 : 0, paddingLeft: 0, justifyContent:'center', marginTop: 2, marginRight: cellSize+gap };
+    }
+
+    // ----- inventory -----
+    const showInventory = (st.phase === 'hook' && st.revealed >= this.REVEAL3.length) || (st.phase === 'apprentice');
+    let inventory = [], inventoryLabel = 'SPELL INVENTORY', inventoryEmpty = false;
+    if (showInventory) {
+      const invVals = st.phase === 'hook' ? st.inv3 : st.inv4.map(v => v*st.factor);
+      const selIdx = st.phase === 'hook' ? st.sel3 : st.sel4;
+      const tStyle = (sel) => ({ width:60, height:64, borderRadius:14, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:30, color:this.NAVY, background:'linear-gradient(180deg,#ffe49a,#f5b831)', border:'3px solid '+this.GOLD_BD, cursor:'pointer', userSelect:'none', transition:'all .16s ease', boxShadow: sel ? '0 0 0 4px '+this.GOLD_GLOW+', 0 8px 16px rgba(0,0,0,.18)' : '0 6px 0 '+this.GOLD_BD, transform: sel ? 'translateY(-4px) scale(1.06)' : 'none' });
+      inventory = invVals.map((v, i) => ({ value: v, style: tStyle(i === selIdx), onClick: () => this.selectTile(i) }));
+      inventoryEmpty = invVals.length === 0;
+      inventoryLabel = st.phase === 'hook' ? 'SPELL INVENTORY \u00b7 TAP A NUMBER, THEN A STONE' : 'SPELL INVENTORY \u00b7 SWAP IN THE RIGHT NUMBER';
+    }
+
+    // ----- spellbook -----
+    const showSpellbook = st.phase === 'apprentice' && !st.solvedApp;
+    const sbBtn = (on) => ({ fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:16, padding:'9px 20px', borderRadius:999, border:'none', cursor:'pointer', transition:'all .15s ease', background: on?accent:'#fff', color: on?'#fff':accentD, boxShadow: on?('0 5px 0 '+accentD):'0 2px 8px rgba(31,37,68,.12)' });
+    const spellbook = [1,2,4].map(f => ({ label: String(34*f), style: sbBtn(st.factor===f), onClick: () => this.setSum(f) }));
+
+    // ----- number strip (learn step 3) -----
+    const showNumberStrip = st.phase === 'learn' && st.learnStep === 2;
+    let numberStrip = [];
+    if (showNumberStrip) {
+      const cur = this.learnHi(2, st.tick).num;
+      numberStrip = [1,2,3,4,5,6,7,8,9].map(n => {
+        const on = n === cur;
+        return { value: n, style: { width:36, height:40, borderRadius:9, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:18, color: on?this.NAVY:'#b9aee6', background: on?'linear-gradient(180deg,#ffe49a,#f5b831)':'rgba(255,255,255,.08)', border: on?('2px solid '+this.GOLD_BD):'1.5px solid rgba(255,255,255,.14)', transition:'all .2s ease', transform: on?'translateY(-3px)':'none', boxShadow: on?('0 0 12px '+this.GOLD_GLOW):'none' } };
+      });
+    }
+
+    // ----- actions -----
+    const primary = { fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:18, padding:'14px 30px', borderRadius:999, border:'none', cursor:'pointer', color:'#fff', background:accent, boxShadow:'0 6px 0 '+accentD, transition:'transform .1s ease' };
+    const secondary = { fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:18, padding:'14px 28px', borderRadius:999, border:'none', cursor:'pointer', color:'#1f2544', background:'#fff', boxShadow:'0 3px 12px rgba(31,37,68,.16)' };
+    const gold1 = { fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:18, padding:'14px 30px', borderRadius:999, border:'none', cursor:'pointer', color:this.NAVY, background:'linear-gradient(180deg,#ffe49a,#f5b831)', boxShadow:'0 6px 0 '+this.GOLD_BD };
+    let actions = [];
+    if (st.phase === 'learn') {
+      const a = [];
+      if (st.learnStep > 0) a.push({ label:'\u2190 Back', style:secondary, onClick: () => this.learnBack() });
+      a.push({ label: st.learnStep < this.LEARN_N - 1 ? 'Next \u2192' : 'Let\u2019s make magic! \u2192', style:primary, onClick: () => this.learnNext() });
+      actions = a;
+    } else if (st.phase === 'hook') {
+      if (st.solvedHook) actions = [ { label:'Cast Another Spell', style:secondary, onClick: () => this.newPuzzle() }, { label:'Enter the 4\u00d74 Hall \u2192', style:primary, onClick: () => this.goto('apprentice') } ];
+      else if (st.revealed >= this.REVEAL3.length) actions = [ { label:'Start over', style:secondary, onClick: () => this.resetHook() } ];
+    } else if (st.phase === 'apprentice') {
+      if (st.solvedApp) actions = [ { label:'Cast Another Spell', style:secondary, onClick: () => this.newApp() }, { label:'Learn the Magician\u2019s Code \u2192', style:primary, onClick: () => this.goto('code') } ];
+    } else {
+      if (st.codeMode === 'choose') {
+        actions = [ { label:'\u2190 Watch the Dance Again', style:secondary, onClick: () => this.goto('code') } ];
+      } else if (st.codeMode === 'play') {
+        if (st.playSolved) actions = [ { label:'Play Again', style:secondary, onClick: () => this.playAgain() }, { label:'Pick a New Grid', style:primary, onClick: () => this.chooseSize() } ];
+        else actions = [ { label:'\u2190 Pick a Different Grid', style:secondary, onClick: () => this.chooseSize() } ];
+      } else {
+        if (st.codeStep < this.CODE.length) actions = [ { label: st.codeStep===0?'Begin the Dance \u2192':'Next Step \u2192', style:gold1, onClick: () => this.codeNext() } ];
+        else actions = [ { label:'Watch Again', style:secondary, onClick: () => this.codeNext() }, { label:'Begin the Puzzle \u2192', style:primary, onClick: () => this.chooseSize() } ];
+      }
+    }
+
+    // ----- sound toggle -----
+    const soundBtnStyle = { fontFamily:'Fredoka,sans-serif', fontWeight:600, fontSize:13, padding:'9px 15px', borderRadius:999, border:'none', cursor:'pointer', background: st.sound? '#fff' : '#eef0f6', color: st.sound? accentD : '#9aa3bd', boxShadow:'0 4px 12px rgba(31,37,68,.14)' };
+
+    // ----- confetti -----
+    const confettiEl = st.confetti.length
+      ? e('div', { style:{ position:'fixed', inset:0, pointerEvents:'none', overflow:'hidden', zIndex:40 } },
+          st.confetti.map((c,i) => e('div', { key:i, style:{ position:'absolute', top:-20, left:c.left+'%', width:c.size, height:c.size, background:c.bg, borderRadius:c.round?'50%':2, animation:'confettiFall '+c.dur+'s '+c.delay+'s ease-in forwards' } })))
+      : null;
+
+    return {
+      rootStyle, cardStyle, panelStyle,
+      cardRef: this.cardRef,
+      levels,
+      wizard: this.wizard(mood),
+      speech, eyebrowText, eyebrowStyle, titleText, titleStyle, bubbleStyle, bubbleTailStyle,
+      targetChipText, targetChipStyle,
+      cells, gridStyle, boardWrapStyle,
+      showSums, rowSums, colSums, rowSumsStyle, colSumsStyle,
+      showInventory, inventory, inventoryLabel, inventoryEmpty,
+      showSpellbook, spellbook,
+      showNumberStrip, numberStrip,
+      actions,
+      soundBtnStyle,
+      soundLabel: st.sound ? 'Sound: On' : 'Sound: Off',
+      toggleSound: () => this.toggleSound(),
+      confettiEl,
+      showTopMascot, showChooser, showBoard, calloutEl, sizeChoices,
+      showPlayRail, playRailLabel, playCurrent, playCurrentStyle, playCaption
+    };
+  }
+}
+</script>
+</body>
+</html>

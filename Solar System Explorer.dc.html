@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    html, body { margin:0; padding:0; height:100%; width:100%; overflow:hidden; background:#060509; }
+    * { box-sizing:border-box; }
+    @keyframes scSpin { to { transform:rotate(360deg); } }
+    @keyframes scTwinkle { 0%,100%{opacity:.85} 50%{opacity:.35} }
+    .sc-scroll::-webkit-scrollbar { width:8px; }
+    .sc-scroll::-webkit-scrollbar-thumb { background:rgba(220,190,150,.25); border-radius:8px; }
+    .sc-scroll::-webkit-scrollbar-track { background:transparent; }
+  </style>
+</helmet>
+
+<div ref="{{ containerRef }}" style="position:fixed; inset:0; overflow:hidden; font-family:'Nunito',sans-serif; user-select:none; -webkit-user-select:none; background:radial-gradient(circle at 50% 44%, #251a15 0%, #150f14 38%, #080610 72%, #050409 100%);">
+
+  <div ref="{{ mountRef }}" style="position:absolute; inset:0;"></div>
+
+  <!-- Hover tooltip -->
+  <div ref="{{ tooltipRef }}" style="position:absolute; top:0; left:0; pointer-events:none; opacity:0; transform:translate(-50%,-140%); transition:opacity .14s ease; padding:7px 14px; border-radius:999px; background:rgba(28,22,18,.82); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); border:1px solid rgba(232,205,160,.22); color:#f4e9d8; font-family:'Fredoka',sans-serif; font-weight:500; font-size:15px; letter-spacing:.2px; white-space:nowrap; box-shadow:0 6px 22px rgba(0,0,0,.4); z-index:30;"></div>
+
+  <!-- Top brand -->
+  <div style="position:absolute; top:26px; left:30px; z-index:20; display:flex; align-items:center; gap:14px; pointer-events:none;">
+    <div style="width:30px; height:30px; border-radius:50%; background:radial-gradient(circle at 35% 30%, #ffe09a, #ff9b2f 60%, #f07a1e); box-shadow:0 0 22px rgba(255,160,60,.65), 0 0 6px rgba(255,210,140,.9);"></div>
+    <div>
+      <div style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:21px; color:#f6ecdc; letter-spacing:.3px; line-height:1;">Our Solar System</div>
+      <div style="font-family:'Nunito',sans-serif; font-weight:600; font-size:12.5px; color:rgba(214,190,158,.62); margin-top:5px; letter-spacing:.3px;">An explorer's guide to the planets</div>
+    </div>
+  </div>
+
+  <!-- Home link -->
+  <a href="Landing.dc.html" style="position:absolute; top:26px; right:30px; z-index:25; display:inline-flex; align-items:center; gap:8px; padding:9px 17px; border-radius:999px; border:1px solid rgba(232,205,160,.22); background:rgba(28,22,18,.6); backdrop-filter:blur(8px); -webkit-backdrop-filter:blur(8px); color:#f4e9d8; font-family:'Fredoka',sans-serif; font-weight:500; font-size:14px; text-decoration:none; letter-spacing:.2px; box-shadow:0 6px 22px rgba(0,0,0,.35);">← Home</a>
+
+  <!-- Footer credit -->
+  <div style="position:absolute; bottom:18px; left:24px; z-index:20; pointer-events:none; font-family:'Nunito',sans-serif; font-size:12px; color:rgba(214,190,158,.5); letter-spacing:.3px;">created by <span style="color:rgba(255,206,130,.78); font-weight:700;">@chetandudhane</span></div>
+
+  <!-- Bottom hint -->
+  <div ref="{{ hintRef }}" style="position:absolute; bottom:24px; left:50%; transform:translateX(-50%); z-index:20; display:flex; align-items:center; gap:18px; padding:10px 20px; border-radius:999px; background:rgba(22,17,14,.5); backdrop-filter:blur(6px); -webkit-backdrop-filter:blur(6px); border:1px solid rgba(232,205,160,.12); color:rgba(228,208,178,.78); font-size:13px; font-weight:600; letter-spacing:.2px; transition:opacity .4s ease; pointer-events:none;">
+    <span>Drag to look around</span>
+    <span style="width:4px;height:4px;border-radius:50%;background:rgba(228,208,178,.4);"></span>
+    <span>Scroll to zoom</span>
+    <span style="width:4px;height:4px;border-radius:50%;background:rgba(228,208,178,.4);"></span>
+    <span style="color:#ffce82;">Click a planet to explore</span>
+  </div>
+
+  <!-- Loading overlay -->
+  <div ref="{{ loadingRef }}" style="position:absolute; inset:0; z-index:50; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; background:radial-gradient(circle at 50% 44%, #251a15 0%, #150f14 38%, #080610 72%, #050409 100%); transition:opacity .6s ease;">
+    <div style="width:46px; height:46px; border-radius:50%; border:3px solid rgba(255,200,130,.18); border-top-color:#ffb43d; animation:scSpin 1s linear infinite;"></div>
+    <div style="font-family:'Fredoka',sans-serif; font-weight:500; color:#e9d8bf; font-size:16px; letter-spacing:.4px;">Charting the Solar System…</div>
+  </div>
+
+  <!-- Focus panel -->
+  <div ref="{{ panelRef }}" class="sc-scroll" style="position:absolute; top:0; right:0; height:100%; width:min(430px,93vw); z-index:40; transform:translateX(112%); transition:transform .55s cubic-bezier(.22,.61,.36,1); overflow-y:auto; padding:30px 30px 44px; background:linear-gradient(180deg, rgba(26,20,17,.9), rgba(18,13,17,.93)); backdrop-filter:blur(22px); -webkit-backdrop-filter:blur(22px); border-left:1px solid rgba(232,205,160,.14); box-shadow:-24px 0 60px rgba(0,0,0,.45);">
+    <sc-if value="{{ focused }}" hint-placeholder-val="{{ true }}">
+      <button onClick="{{ closePanel }}" style="display:inline-flex; align-items:center; gap:8px; padding:9px 16px; border-radius:999px; border:1px solid rgba(232,205,160,.2); background:rgba(255,255,255,.04); color:#e9d8bf; font-family:'Fredoka',sans-serif; font-weight:500; font-size:13.5px; cursor:pointer; letter-spacing:.2px;" style-hover="{{ backHover }}">
+        <span style="font-size:16px; line-height:1;">‹</span> Back to the Solar System
+      </button>
+
+      <div style="margin-top:28px; display:flex; align-items:center; gap:16px;">
+        <div style="{{ chipStyle }}"></div>
+        <div>
+          <div style="font-family:'Fredoka',sans-serif; font-weight:600; font-size:34px; color:#f7eedd; line-height:1; letter-spacing:.3px;">{{ planetName }}</div>
+          <div style="{{ taglineStyle }}">{{ planetTagline }}</div>
+        </div>
+      </div>
+
+      <p style="margin:26px 0 0; font-size:17px; line-height:1.68; color:#e7dcca; font-weight:500; text-wrap:pretty;">{{ planetSummary }}</p>
+
+      <div style="margin:34px 0 14px; display:flex; align-items:center; gap:12px;">
+        <div style="height:1px; flex:1; background:linear-gradient(90deg, transparent, rgba(232,205,160,.28));"></div>
+        <span style="font-family:'Fredoka',sans-serif; font-weight:500; font-size:12.5px; letter-spacing:1.4px; text-transform:uppercase; color:rgba(220,196,162,.66);">Discover More</span>
+        <div style="height:1px; flex:1; background:linear-gradient(90deg, rgba(232,205,160,.28), transparent);"></div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:12px;">
+        <sc-for list="{{ topics }}" as="topic" hint-placeholder-count="3">
+          <div style="{{ topic.itemStyle }}">
+            <button onClick="{{ topic.toggle }}" style="width:100%; display:flex; align-items:center; justify-content:space-between; gap:12px; padding:16px 18px; background:transparent; border:none; cursor:pointer; text-align:left; font-family:'Fredoka',sans-serif; font-weight:500; font-size:16px; color:#f3e8d6;">
+              <span>{{ topic.title }}</span>
+              <span style="{{ topic.iconStyle }}">+</span>
+            </button>
+            <div style="{{ topic.bodyOuterStyle }}">
+              <div style="overflow:hidden;">
+                <p style="margin:0; padding:2px 18px 18px; font-size:15.5px; line-height:1.62; color:#d7cab6; font-weight:500; text-wrap:pretty;">{{ topic.body }}</p>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </sc-if>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+class Component extends DCLogic {
+  state = { focusedKey: null, openTopic: null };
+
+  containerRef = React.createRef();
+  mountRef = React.createRef();
+  tooltipRef = React.createRef();
+  panelRef = React.createRef();
+  loadingRef = React.createRef();
+  hintRef = React.createRef();
+
+  PLANETS = [
+    { key:'sun', name:'The Sun', tagline:'Our nearest star', color:'#ff9e35',
+      size:9, orbit:0, speed:0, spin:0.025, tilt:0.12, type:'sun',
+      summary:'The Sun is a giant ball of glowing gas right in the middle of our Solar System. Every planet circles around it. Without the Sun there would be no light, no warmth, and no life on Earth.',
+      topics:[
+        {title:'What is it made of?', body:'Mostly two gases called hydrogen and helium. It is so incredibly hot that nothing solid could ever survive there — no rocks, no ground, just blazing gas.'},
+        {title:'How long is a year here?', body:'The Sun does not orbit anything, so it has no year like the planets do. But it does slowly turn around, taking about 25 Earth days to spin once.'},
+        {title:'Mind-blowing fun fact!', body:'The Sun is so enormous that about one million Earths could fit inside it. And it is the heaviest thing in our whole Solar System!'}
+      ] },
+    { key:'mercury', name:'Mercury', tagline:'The speedy little planet', color:'#9c8a78',
+      size:1.15, orbit:17, speed:1.0, spin:0.45, tilt:0.02, type:'rocky',
+      summary:'Mercury is the smallest planet and the closest one to the Sun. It zooms around the Sun faster than any other planet. In the day it is boiling hot, but at night it turns freezing cold.',
+      topics:[
+        {title:'What is it made of?', body:'Rock and metal, with a huge iron heart in the middle. Its surface is covered in craters, a bit like our Moon.'},
+        {title:'How long is a year here?', body:'A whole year on Mercury is only 88 Earth days. If you lived there, you would have a birthday about every three months!'},
+        {title:'Mind-blowing fun fact!', body:'Even though it sits closest to the Sun, Mercury is NOT the hottest planet. That title belongs to its neighbour, Venus.'}
+      ] },
+    { key:'venus', name:'Venus', tagline:'The hottest planet', color:'#dcab63',
+      size:1.7, orbit:23, speed:0.78, spin:-0.2, tilt:0.05, type:'rocky',
+      summary:'Venus is the hottest planet in the entire Solar System. It is wrapped in thick, poisonous clouds that trap heat like a heavy blanket. It is almost the same size as Earth, so it is sometimes called Earth\u2019s twin.',
+      topics:[
+        {title:'What is it made of?', body:'A rocky surface with thousands of volcanoes, all hidden under thick swirling clouds of acid.'},
+        {title:'How long is a year here?', body:'A year on Venus is 225 Earth days. The strangest part? One day on Venus is even LONGER than its whole year!'},
+        {title:'Mind-blowing fun fact!', body:'Venus spins backwards! If you stood there, you would watch the Sun rise in the west and set in the east.'}
+      ] },
+    { key:'earth', name:'Earth', tagline:'Our home', color:'#3f7fd0',
+      size:1.8, orbit:30, speed:0.66, spin:0.85, tilt:0.41, type:'earth',
+      summary:'Earth is our home, and the only place we know of that has life. It is covered in oceans of water and wrapped in air we can breathe. From space it looks like a beautiful blue marble.',
+      topics:[
+        {title:'What is it made of?', body:'Rock and metal on the inside, with oceans of liquid water on top and a thin layer of air all around it.'},
+        {title:'How long is a year here?', body:'A year on Earth is 365 days \u2014 exactly the time it takes to travel all the way around the Sun one time.'},
+        {title:'Mind-blowing fun fact!', body:'Earth is the only planet not named after a Greek or Roman god. And so far, it is the only world we have found with living things on it!'}
+      ] },
+    { key:'mars', name:'Mars', tagline:'The Red Planet', color:'#c1502e',
+      size:1.4, orbit:37.5, speed:0.53, spin:0.82, tilt:0.44, type:'rocky',
+      summary:'Mars is known as the Red Planet because its dusty ground is the colour of rust. It is cold, dry and rocky, with the tallest volcano in the whole Solar System. Scientists send robots there to explore.',
+      topics:[
+        {title:'What is it made of?', body:'Rock and iron-rich dust. That iron is what gives Mars its famous reddish-orange colour, like rusty metal.'},
+        {title:'How long is a year here?', body:'A year on Mars lasts 687 Earth days \u2014 nearly twice as long as a year on Earth.'},
+        {title:'Mind-blowing fun fact!', body:'Mars is home to Olympus Mons, a giant volcano about three times taller than Mount Everest!'}
+      ] },
+    { key:'jupiter', name:'Jupiter', tagline:'The biggest planet', color:'#cda079',
+      size:4.6, orbit:52, speed:0.29, spin:1.5, tilt:0.05, type:'gas',
+      summary:'Jupiter is the biggest planet of all \u2014 so huge that every other planet could fit inside it! It is a giant spinning ball of gas with no solid ground at all. It even has a storm bigger than the whole Earth.',
+      topics:[
+        {title:'What is it made of?', body:'Mostly gas \u2014 hydrogen and helium \u2014 with no hard surface. A spaceship could never land on it because there is nothing solid to stand on.'},
+        {title:'How long is a year here?', body:'One year on Jupiter lasts about 12 Earth years! It is so far from the Sun that one trip around takes a very long time.'},
+        {title:'Mind-blowing fun fact!', body:'Jupiter\u2019s Great Red Spot is a giant storm that has been swirling for over 300 years \u2014 longer than anyone alive has been around!'}
+      ] },
+    { key:'saturn', name:'Saturn', tagline:'The ringed planet', color:'#e0c486',
+      size:3.9, orbit:66, speed:0.22, spin:1.35, tilt:0.47, type:'gas-ring',
+      summary:'Saturn is famous for its beautiful rings, which circle around it like a giant hula hoop. It is a huge ball of gas, and it is so light that it would actually float in water. It has dozens of moons too.',
+      topics:[
+        {title:'What is it made of?', body:'Mostly gas, just like Jupiter. Its sparkling rings are made of billions of pieces of ice and rock, from tiny grains to chunks as big as a house.'},
+        {title:'How long is a year here?', body:'A year on Saturn lasts about 29 Earth years \u2014 so you would wait a very long time between birthdays!'},
+        {title:'Mind-blowing fun fact!', body:'Saturn\u2019s rings are super wide but amazingly thin. If you shrank Saturn to the size of a beach ball, the rings would be thinner than a sheet of paper.'}
+      ] },
+    { key:'uranus', name:'Uranus', tagline:'The sideways planet', color:'#a7e0e0',
+      size:2.6, orbit:78, speed:0.16, spin:0.7, tilt:1.71, type:'ice',
+      summary:'Uranus is a cold, icy giant that glows a pale blue-green. The strangest thing about it is that it spins on its side, like a ball rolling along the ground! It is so far away you cannot see it without a telescope.',
+      topics:[
+        {title:'What is it made of?', body:'Icy gases such as water, ammonia and methane. The methane gas is what soaks up red light and gives Uranus its blue-green colour.'},
+        {title:'How long is a year here?', body:'A year on Uranus lasts about 84 Earth years \u2014 most people would only ever see one Uranus birthday in a whole lifetime!'},
+        {title:'Mind-blowing fun fact!', body:'Because Uranus rolls on its side, each of its seasons lasts about 21 Earth years. Imagine a summer that lasted that long!'}
+      ] },
+    { key:'neptune', name:'Neptune', tagline:'The windy blue giant', color:'#3b62c4',
+      size:2.5, orbit:89, speed:0.13, spin:0.8, tilt:0.49, type:'ice',
+      summary:'Neptune is the farthest planet from the Sun \u2014 dark, freezing cold and very windy. It is a deep blue ice giant with the fastest winds anywhere in the Solar System. It is so far away that a single trip around the Sun takes ages.',
+      topics:[
+        {title:'What is it made of?', body:'Icy gases, with a deep blue colour that comes from the gas methane high up in its clouds.'},
+        {title:'How long is a year here?', body:'A year on Neptune lasts about 165 Earth years! Since people discovered it, it has only finished one full lap around the Sun.'},
+        {title:'Mind-blowing fun fact!', body:'Neptune has the fastest winds in the Solar System \u2014 they can blow faster than a racing car at top speed!'}
+      ] }
+  ];
+
+  THREE_URL = 'https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.min.js';
+  ORBIT_URL = 'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js';
+  BASE_ORBIT = 0.16;
+
+  componentDidMount() {
+    this.disposed = false;
+    this.timeScale = 1;
+    this._tmp = null;
+    this.bodies = [];
+    this.pickables = [];
+    this.bootstrap();
+  }
+
+  componentWillUnmount() {
+    this.disposed = true;
+    if (this.raf) cancelAnimationFrame(this.raf);
+    if (this._onResize) window.removeEventListener('resize', this._onResize);
+    try { if (this.renderer) { this.renderer.dispose(); this.renderer.forceContextLoss && this.renderer.forceContextLoss(); } } catch(e){}
+  }
+
+  setPanelOpen(open) {
+    if (this.panelRef.current) this.panelRef.current.style.transform = open ? 'translateX(0)' : 'translateX(112%)';
+    if (this.hintRef.current) this.hintRef.current.style.opacity = open ? '0' : '1';
+    const tip = this.tooltipRef.current; if (open && tip) tip.style.opacity = '0';
+  }
+
+  loadScript(src) {
+    return new Promise((res, rej) => {
+      if ([...document.scripts].some(s => s.src === src)) return res();
+      const s = document.createElement('script');
+      s.src = src; s.onload = () => res(); s.onerror = () => rej(new Error('Failed: ' + src));
+      document.head.appendChild(s);
+    });
+  }
+
+  async bootstrap() {
+    try {
+      await this.loadScript(this.THREE_URL);
+      await this.loadScript(this.ORBIT_URL);
+      if (this.disposed) return;
+      this.initThree();
+      const el = this.loadingRef.current;
+      if (el) { el.style.opacity = '0'; setTimeout(() => { if (el) el.style.display = 'none'; }, 650); }
+    } catch (e) { console.error(e); }
+  }
+
+  // ---------- procedural textures ----------
+  shade(hex, amt) {
+    let h = hex.replace('#',''); if (h.length===3) h = h.split('').map(c=>c+c).join('');
+    let r = parseInt(h.slice(0,2),16), g = parseInt(h.slice(2,4),16), b = parseInt(h.slice(4,6),16);
+    const f = (v) => Math.max(0, Math.min(255, Math.round(amt>=0 ? v+(255-v)*amt : v*(1+amt))));
+    return 'rgb(' + f(r) + ',' + f(g) + ',' + f(b) + ')';
+  }
+  makeTex(w, h, draw) {
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
+    draw(c.getContext('2d'), w, h);
+    const t = new this.T.CanvasTexture(c); t.encoding = this.T.sRGBEncoding; t.anisotropy = 4; t.needsUpdate = true;
+    return t;
+  }
+  rockyTex(base, craters) {
+    return this.makeTex(512, 256, (ctx, w, h) => {
+      ctx.fillStyle = base; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<2200;i++){ const x=Math.random()*w, y=Math.random()*h, r=Math.random()*7+1;
+        ctx.globalAlpha = Math.random()*0.5+0.12; ctx.fillStyle = this.shade(base, (Math.random()-0.5)*0.7);
+        ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill(); }
+      if (craters) for (let i=0;i<60;i++){ const x=Math.random()*w, y=Math.random()*h, r=Math.random()*10+4;
+        ctx.globalAlpha=0.5; ctx.fillStyle=this.shade(base,-0.45); ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill();
+        ctx.globalAlpha=0.35; ctx.fillStyle=this.shade(base,0.4); ctx.beginPath(); ctx.arc(x-r*0.25,y-r*0.25,r*0.6,0,7); ctx.fill(); }
+      ctx.globalAlpha=1;
+    });
+  }
+  gasTex(base, spot) {
+    return this.makeTex(512, 256, (ctx, w, h) => {
+      ctx.fillStyle = base; ctx.fillRect(0,0,w,h);
+      let y=0; while (y<h){ const bh = Math.random()*10+5; ctx.fillStyle = this.shade(base,(Math.random()-0.5)*0.45);
+        ctx.globalAlpha = 0.55; ctx.fillRect(0,y,w,bh); y+=bh; }
+      ctx.globalAlpha=0.25;
+      for (let i=0;i<120;i++){ const yy=Math.random()*h; ctx.strokeStyle=this.shade(base,(Math.random()-0.5)*0.6); ctx.lineWidth=Math.random()*3+1;
+        ctx.beginPath(); ctx.moveTo(0,yy); for(let x=0;x<=w;x+=32){ ctx.lineTo(x, yy+Math.sin(x*0.05+i)*3); } ctx.stroke(); }
+      if (spot){ ctx.globalAlpha=0.9; const sx=w*0.7, sy=h*0.62; const g=ctx.createRadialGradient(sx,sy,2,sx,sy,28);
+        g.addColorStop(0,'#e8744a'); g.addColorStop(0.6,'#c8552f'); g.addColorStop(1,'rgba(200,85,47,0)');
+        ctx.fillStyle=g; ctx.beginPath(); ctx.ellipse(sx,sy,30,16,0,0,7); ctx.fill(); }
+      ctx.globalAlpha=1;
+    });
+  }
+  earthTex() {
+    return this.makeTex(512, 256, (ctx, w, h) => {
+      const g = ctx.createLinearGradient(0,0,0,h); g.addColorStop(0,'#1b4f86'); g.addColorStop(0.5,'#236aa6'); g.addColorStop(1,'#1b4f86');
+      ctx.fillStyle = g; ctx.fillRect(0,0,w,h);
+      const land = ['#3f7d3a','#4f8a3e','#6f8f48','#7a6a3e'];
+      for (let i=0;i<26;i++){ const x=Math.random()*w, y=h*0.18+Math.random()*h*0.64; ctx.fillStyle=land[i%land.length]; ctx.globalAlpha=0.9;
+        ctx.beginPath(); const n=8+Math.floor(Math.random()*6); for(let k=0;k<n;k++){ const a=k/n*7; const rr=10+Math.random()*26; ctx.lineTo(x+Math.cos(a)*rr, y+Math.sin(a)*rr*0.7); } ctx.closePath(); ctx.fill(); }
+      ctx.globalAlpha=0.85; ctx.fillStyle='#eef3f6';
+      ctx.fillRect(0,0,w,12); ctx.fillRect(0,h-14,w,14);
+      ctx.globalAlpha=0.18; ctx.fillStyle='#ffffff';
+      for (let i=0;i<40;i++){ const x=Math.random()*w,y=Math.random()*h,r=Math.random()*18+6; ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill(); }
+      ctx.globalAlpha=1;
+    });
+  }
+  sunTex() {
+    return this.makeTex(512, 256, (ctx, w, h) => {
+      ctx.fillStyle = '#ff9b2f'; ctx.fillRect(0,0,w,h);
+      for (let i=0;i<1600;i++){ const x=Math.random()*w,y=Math.random()*h,r=Math.random()*9+2;
+        ctx.globalAlpha=Math.random()*0.5+0.2; const c=Math.random(); ctx.fillStyle = c>0.5?this.shade('#ffd36b',Math.random()*0.4):this.shade('#f06a18',Math.random()*0.3);
+        ctx.beginPath(); ctx.arc(x,y,r,0,7); ctx.fill(); }
+      ctx.globalAlpha=1;
+    });
+  }
+  glowTex() {
+    return this.makeTex(256, 256, (ctx, w, h) => {
+      const g = ctx.createRadialGradient(w/2,h/2,0,w/2,h/2,w/2);
+      g.addColorStop(0,'rgba(255,225,160,0.95)'); g.addColorStop(0.25,'rgba(255,176,80,0.55)');
+      g.addColorStop(0.55,'rgba(255,140,50,0.18)'); g.addColorStop(1,'rgba(255,120,40,0)');
+      ctx.fillStyle=g; ctx.fillRect(0,0,w,h);
+    });
+  }
+  ringTex() {
+    return this.makeTex(512, 8, (ctx, w, h) => {
+      for (let x=0;x<w;x++){ const f=x/w; let a = 0.55+0.35*Math.sin(f*70)+0.1*Math.sin(f*220);
+        if (f<0.06||f>0.97) a=0; if (f>0.46&&f<0.52) a*=0.15; a=Math.max(0,Math.min(1,a));
+        const l=(Math.sin(f*60)*0.18); ctx.fillStyle=this.shade('#e4cda0',l); ctx.globalAlpha=a; ctx.fillRect(x,0,1,h); }
+      ctx.globalAlpha=1;
+    });
+  }
+
+  // ---------- scene ----------
+  initThree() {
+    const T = this.T = window.THREE;
+    const mount = this.mountRef.current;
+    const w = mount.clientWidth, h = mount.clientHeight;
+
+    const scene = this.scene = new T.Scene();
+    const camera = this.camera = new T.PerspectiveCamera(50, w/h, 0.1, 4000);
+    this.homePos = new T.Vector3(0, 62, 132);
+    this.homeTarget = new T.Vector3(0, 0, 0);
+    camera.position.copy(this.homePos);
+
+    const renderer = this.renderer = new T.WebGLRenderer({ antialias:true, alpha:true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio||1, 2));
+    renderer.setSize(w, h);
+    renderer.outputEncoding = T.sRGBEncoding;
+    mount.appendChild(renderer.domElement);
+    renderer.domElement.style.cursor = 'grab';
+
+    const controls = this.controls = new T.OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true; controls.dampingFactor = 0.06;
+    controls.minDistance = 14; controls.maxDistance = 340;
+    controls.maxPolarAngle = Math.PI * 0.92;
+    controls.target.copy(this.homeTarget);
+    this._tmpTarget = controls.target.clone();
+
+    // lights
+    scene.add(new T.AmbientLight(0x3a4660, 0.32));
+    const sunLight = new T.PointLight(0xfff0d4, 2.4, 0, 0);
+    scene.add(sunLight);
+
+    // starfield
+    const N = 1900; const arr = new Float32Array(N*3); const col = new Float32Array(N*3);
+    const warm = [[1,0.95,0.85],[1,0.85,0.6],[0.8,0.88,1],[1,1,1]];
+    for (let i=0;i<N;i++){ const r=420+Math.random()*1100; const th=Math.random()*Math.PI*2; const ph=Math.acos(2*Math.random()-1);
+      arr[i*3]=r*Math.sin(ph)*Math.cos(th); arr[i*3+1]=r*Math.cos(ph); arr[i*3+2]=r*Math.sin(ph)*Math.sin(th);
+      const c=warm[Math.floor(Math.random()*warm.length)]; const b=0.6+Math.random()*0.4; col[i*3]=c[0]*b; col[i*3+1]=c[1]*b; col[i*3+2]=c[2]*b; }
+    const sg = new T.BufferGeometry();
+    sg.setAttribute('position', new T.BufferAttribute(arr,3));
+    sg.setAttribute('color', new T.BufferAttribute(col,3));
+    scene.add(new T.Points(sg, new T.PointsMaterial({ size:1.5, sizeAttenuation:true, vertexColors:true, transparent:true, opacity:0.9 })));
+
+    // bodies
+    this.PLANETS.forEach(p => {
+      const obj = new T.Object3D(); scene.add(obj);
+      const tilt = new T.Object3D(); tilt.rotation.z = p.tilt; obj.add(tilt);
+
+      let tex;
+      if (p.type==='sun') tex = this.sunTex();
+      else if (p.type==='earth') tex = this.earthTex();
+      else if (p.type==='gas') tex = this.gasTex(p.color, true);
+      else if (p.type==='gas-ring') tex = this.gasTex(p.color, false);
+      else if (p.type==='ice') tex = this.gasTex(p.color, false);
+      else tex = this.rockyTex(p.color, p.key==='mercury'||p.key==='mars');
+
+      const geo = new T.SphereGeometry(p.size, 48, 48);
+      const mat = p.type==='sun'
+        ? new T.MeshBasicMaterial({ map:tex })
+        : new T.MeshStandardMaterial({ map:tex, roughness:0.92, metalness:0.04 });
+      const mesh = new T.Mesh(geo, mat);
+      mesh.userData.key = p.key;
+      tilt.add(mesh);
+      this.pickables.push(mesh);
+
+      if (p.type==='sun') {
+        const glow = new T.Sprite(new T.SpriteMaterial({ map:this.glowTex(), color:0xffffff, transparent:true, blending:T.AdditiveBlending, depthWrite:false }));
+        glow.scale.set(p.size*7, p.size*7, 1); obj.add(glow);
+        const glow2 = new T.Sprite(new T.SpriteMaterial({ map:this.glowTex(), color:0xffcaa0, transparent:true, blending:T.AdditiveBlending, depthWrite:false, opacity:0.6 }));
+        glow2.scale.set(p.size*3.4, p.size*3.4, 1); obj.add(glow2);
+      }
+
+      if (p.type==='gas-ring') {
+        const inner = p.size*1.45, outer = p.size*2.45;
+        const rgeo = new T.RingGeometry(inner, outer, 96, 1);
+        const pos = rgeo.attributes.position, uv = rgeo.attributes.uv;
+        const v = new T.Vector3();
+        for (let i=0;i<pos.count;i++){ v.set(pos.getX(i), pos.getY(i), 0); const d=v.length();
+          uv.setXY(i, (d-inner)/(outer-inner), 0.5); }
+        const ring = new T.Mesh(rgeo, new T.MeshBasicMaterial({ map:this.ringTex(), side:T.DoubleSide, transparent:true, opacity:0.92, depthWrite:false }));
+        ring.rotation.x = -Math.PI/2;
+        tilt.add(ring);
+      }
+
+      // orbit line
+      if (p.orbit > 0) {
+        const pts=[]; for (let a=0;a<=140;a++){ const t=a/140*Math.PI*2; pts.push(new T.Vector3(Math.cos(t)*p.orbit,0,Math.sin(t)*p.orbit)); }
+        const lg = new T.BufferGeometry().setFromPoints(pts);
+        scene.add(new T.LineLoop(lg, new T.LineBasicMaterial({ color:0xc4ad8e, transparent:true, opacity:0.14 })));
+      }
+
+      const b = { p, obj, mesh, angle: Math.random()*Math.PI*2 };
+      obj.position.set(Math.cos(b.angle)*p.orbit, 0, Math.sin(b.angle)*p.orbit);
+      this.bodies.push(b);
+      if (p.key==='sun') this.sunBody = b;
+    });
+
+    // interaction
+    this.ray = new T.Raycaster();
+    this.ndc = new T.Vector2();
+    const dom = renderer.domElement;
+    dom.addEventListener('pointermove', this.onMove);
+    dom.addEventListener('pointerdown', this.onDown);
+    dom.addEventListener('pointerup', this.onUp);
+
+    this._onResize = () => {
+      const W = mount.clientWidth, H = mount.clientHeight;
+      camera.aspect = W/H; camera.updateProjectionMatrix(); renderer.setSize(W,H);
+    };
+    window.addEventListener('resize', this._onResize);
+
+    this.clock = new T.Clock();
+    this.focus = null;
+    this.returning = false;
+    this.animate();
+  }
+
+  pick(e) {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    this.ndc.x = ((e.clientX-rect.left)/rect.width)*2 - 1;
+    this.ndc.y = -((e.clientY-rect.top)/rect.height)*2 + 1;
+    this.ray.setFromCamera(this.ndc, this.camera);
+    const hit = this.ray.intersectObjects(this.pickables, false);
+    return hit.length ? hit[0].object.userData.key : null;
+  }
+
+  onMove = (e) => {
+    const rect = this.renderer.domElement.getBoundingClientRect();
+    if (this._down) { const dx=e.clientX-this._down.x, dy=e.clientY-this._down.y; if (dx*dx+dy*dy>30) this._down.moved=true; }
+    const key = this.pick(e);
+    const tip = this.tooltipRef.current;
+    if (key) {
+      this.renderer.domElement.style.cursor = 'pointer';
+      const p = this.PLANETS.find(d=>d.key===key);
+      if (tip){ tip.textContent = p.name; tip.style.left = (e.clientX-rect.left)+'px'; tip.style.top = (e.clientY-rect.top)+'px'; tip.style.opacity='1'; }
+    } else {
+      this.renderer.domElement.style.cursor = this._down ? 'grabbing' : 'grab';
+      if (tip) tip.style.opacity='0';
+    }
+  };
+  onDown = (e) => { this._down = { x:e.clientX, y:e.clientY, moved:false }; };
+  onUp = (e) => {
+    const d = this._down; this._down = null;
+    this.renderer.domElement.style.cursor = 'grab';
+    if (!d || d.moved) return;
+    const key = this.pick(e);
+    if (key) this.selectPlanet(key);
+  };
+
+  selectPlanet(key) {
+    const b = this.bodies.find(x=>x.p.key===key); if (!b) return;
+    const T = this.T;
+    const dist = b.p.size*3.6 + 8;
+    const offset = new T.Vector3(0.55, 0.42, 1).normalize().multiplyScalar(dist);
+    this._tmpTarget.copy(this.controls.target);
+    this.focus = { body:b, offset, phase:'in', prev:new T.Vector3() };
+    this.returning = false;
+    this.setState({ focusedKey: key, openTopic: null });
+    this.setPanelOpen(true);
+  }
+
+  closePanel = () => {
+    if (!this.T) return;
+    this._tmpTarget.copy(this.controls.target);
+    this.focus = null;
+    this.returning = true;
+    this.setState({ focusedKey: null, openTopic: null });
+    this.setPanelOpen(false);
+  };
+
+  animate = () => {
+    if (this.disposed) return;
+    this.raf = requestAnimationFrame(this.animate);
+    const T = this.T;
+    const dt = Math.min(this.clock.getDelta(), 0.05);
+
+    const target = this.focus ? 0.07 : 1;
+    this.timeScale += (target - this.timeScale) * Math.min(1, dt*3);
+
+    this.bodies.forEach(b => {
+      if (b.p.orbit > 0) {
+        b.angle += this.BASE_ORBIT * b.p.speed * this.timeScale * dt;
+        b.obj.position.set(Math.cos(b.angle)*b.p.orbit, 0, Math.sin(b.angle)*b.p.orbit);
+      }
+      b.mesh.rotation.y += b.p.spin * dt * (0.4 + 0.6*this.timeScale);
+    });
+
+    const cam = this.camera, ctr = this.controls;
+    if (this.focus) {
+      const tgt = this.focus.body.obj.position;
+      if (this.focus.phase === 'in') {
+        ctr.enabled = false;
+        const dest = tgt.clone().add(this.focus.offset);
+        cam.position.lerp(dest, 0.08);
+        this._tmpTarget.lerp(tgt, 0.12); ctr.target.copy(this._tmpTarget);
+        cam.lookAt(this._tmpTarget);
+        if (cam.position.distanceTo(dest) < 0.8) { this.focus.phase = 'locked'; this.focus.prev.copy(tgt); ctr.enabled = true; }
+      } else {
+        const drift = tgt.clone().sub(this.focus.prev);
+        cam.position.add(drift); ctr.target.add(drift); this.focus.prev.copy(tgt);
+        ctr.update();
+      }
+    } else if (this.returning) {
+      ctr.enabled = false;
+      cam.position.lerp(this.homePos, 0.06);
+      this._tmpTarget.lerp(this.homeTarget, 0.08); ctr.target.copy(this._tmpTarget);
+      cam.lookAt(this._tmpTarget);
+      if (cam.position.distanceTo(this.homePos) < 1.2) { this.returning = false; ctr.enabled = true; }
+    } else {
+      ctr.update();
+    }
+
+    this.renderer.render(this.scene, cam);
+  };
+
+  renderVals() {
+    const p = this.PLANETS.find(d => d.key === this.state.focusedKey);
+    const topics = p ? p.topics.map((t, i) => {
+      const open = this.state.openTopic === i;
+      return {
+        title: t.title, body: t.body, open,
+        itemStyle: { borderRadius:'15px', overflow:'hidden', border:'1px solid ' + (open ? 'rgba(255,200,130,.3)' : 'rgba(232,205,160,.13)'), background: open ? 'rgba(255,200,130,.06)' : 'rgba(255,255,255,.03)', transition:'border-color .25s, background .25s' },
+        iconStyle: { fontFamily:"'Fredoka',sans-serif", fontWeight:400, fontSize:'22px', lineHeight:1, color: open ? '#ffce82' : 'rgba(228,208,178,.7)', transform: open ? 'rotate(45deg)' : 'rotate(0deg)', transition:'transform .3s ease, color .25s' },
+        bodyOuterStyle: { maxHeight: open ? '400px' : '0px', overflow:'hidden', opacity: open ? 1 : 0, transition: open ? 'max-height .42s ease, opacity .3s ease .08s' : 'max-height .32s ease, opacity .2s ease' },
+        toggle: () => this.setState(s => ({ openTopic: s.openTopic === i ? null : i }))
+      };
+    }) : [];
+
+    return {
+      containerRef: this.containerRef,
+      mountRef: this.mountRef,
+      tooltipRef: this.tooltipRef,
+      panelRef: this.panelRef,
+      loadingRef: this.loadingRef,
+      hintRef: this.hintRef,
+      focused: !!p,
+      planetName: p ? p.name : '',
+      planetTagline: p ? p.tagline : '',
+      planetSummary: p ? p.summary : '',
+      chipStyle: { width:'48px', height:'48px', borderRadius:'50%', flex:'none', background: p ? 'radial-gradient(circle at 34% 30%, ' + this.shade(p.color,0.35) + ', ' + p.color + ' 68%, ' + this.shade(p.color,-0.35) + ')' : '#888', boxShadow: p ? '0 0 22px ' + p.color + '88, inset -3px -3px 8px rgba(0,0,0,.4)' : 'none' },
+      taglineStyle: { fontFamily:"'Nunito',sans-serif", fontWeight:700, fontSize:'13px', letterSpacing:'1.2px', textTransform:'uppercase', color: p ? this.shade(p.color, 0.3) : '#aaa', marginTop:'7px' },
+      backHover: { background:'rgba(255,255,255,.09)', borderColor:'rgba(232,205,160,.4)' },
+      topics,
+      closePanel: this.closePanel
+    };
+  }
+}
+</script>
+</body>
+</html>
