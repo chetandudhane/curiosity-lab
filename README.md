@@ -24,9 +24,48 @@ A friendly **Landing** page ties them together so kids can pick their own advent
 
 ---
 
+## 🪐 About Solar System Explorer
+
+Float through a hand-built 3D Solar System and meet every planet up close.
+
+- **Drag to look around, scroll to zoom**, and watch the planets quietly orbit the Sun.
+- **Click any planet** to glide in for a closer look and open its info panel.
+- Each planet card shares **what it's made of, how long a year lasts there, and a mind-blowing fun fact** — written for curious kids.
+- Procedurally textured worlds, glowing Sun, and Saturn's rings — no two runs look quite the same.
+
+> *The "aha!":* Space is huge — and beautiful.
+
+---
+
+## 💡 About Binary Lights
+
+A row of light bulbs that teaches how computers count with nothing but **on** and **off**.
+
+- **Tap the bulbs** to switch them on and off and watch the number change.
+- Each bulb is worth double the one before it (1, 2, 4, 8, 16…), so kids *discover* place value by playing.
+- Friendly challenges nudge them to "make 13" or "make 20" and light up the right pattern.
+- Bit cheers correct answers and gently helps with a hint when a guess is off.
+
+> *The "aha!":* "16 looks like **10000** to a computer!"
+
+---
+
+## 🔢 About Mathe-Magic Squares
+
+A puzzle board where every row, column and diagonal adds up to the same **magic number**.
+
+- **Place the tiles** to build a magic square, or watch the **Siamese method** "dance" fill one in step by step.
+- Live row, column and diagonal totals show kids instantly when the magic is working.
+- Built to reveal the hidden pattern behind a trick that looks like pure wizardry.
+- Encouraging feedback throughout — wrong moves get an "Oops!" and a hint, never a penalty.
+
+> *The "aha!":* Every row, column and diagonal can add to the same magic number.
+
+---
+
 ## 🌍 About Globe Explorer
 
-Spin a 3D Earth, then **dive** straight into a zoomable 2D atlas:
+Spin a 3D Earth, then **dive** straight into a zoomable 2D atlas.
 
 - **Tap any country** to open a card with its flag, capital, a fun fact, which hemisphere it's in, and how far it sits from the Equator.
 - **A live "what time is it there?" clock** shows the country's *real* current time using proper time zones — so half-hour and quarter-hour offsets (India +5:30, Nepal +5:45) and daylight saving are all correct — along with the time-zone name.
