@@ -573,7 +573,7 @@ class Component extends DCLogic {
     if(f&&f.__country) this.selectCountry(f.__country);
   }
   // ---------- quiz ----------
-  centerWorld(){ if(!this.mapView) return; const r=this.mapView.getBoundingClientRect(); this.mapScale=Math.max(0.85,Math.min(1.3, r.width/1400)); this.mapX=(r.width-1400*this.mapScale)/2; this.mapY=(r.height-700*this.mapScale)/2; this.clampMap(); this.applyMapTransform(); }
+  centerWorld(){ if(!this.mapView) return; const W0=this.mapView.clientWidth, H0=this.mapView.clientHeight; this.mapScale=Math.max(0.85,Math.min(1.3, W0/1400)); this.mapX=(W0-1400*this.mapScale)/2; this.mapY=(H0-700*this.mapScale)/2; this.clampMap(); this.applyMapTransform(); }
   startQuiz=()=>{
     const pool=this.COUNTRIES.filter(c=>c.rank<=2 && this.clickable.some(f=>f.__country===c));
     for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
@@ -647,9 +647,9 @@ class Component extends DCLogic {
   }
   startClock(){ this.stopClock(); this._clock=setInterval(()=>{ if(this.state.selected) this.setState(s=>({clockTick:s.clockTick+1})); }, 1000); }
   stopClock(){ if(this._clock){ clearInterval(this._clock); this._clock=null; } }
-  clampMap(){ if(!this.mapView) return; const r=this.mapView.getBoundingClientRect(); const W=1400*this.mapScale, H=700*this.mapScale; this.mapX = W<=r.width ? (r.width-W)/2 : Math.min(0,Math.max(r.width-W,this.mapX)); this.mapY = H<=r.height ? (r.height-H)/2 : Math.min(0,Math.max(r.height-H,this.mapY)); }
+  clampMap(){ if(!this.mapView) return; const rw=this.mapView.clientWidth, rh=this.mapView.clientHeight; const W=1400*this.mapScale, H=700*this.mapScale; this.mapX = W<=rw ? (rw-W)/2 : Math.min(0,Math.max(rw-W,this.mapX)); this.mapY = H<=rh ? (rh-H)/2 : Math.min(0,Math.max(rh-H,this.mapY)); }
   applyMapTransform(){ if(this.mapInner) this.mapInner.style.transform='translate('+this.mapX+'px,'+this.mapY+'px) scale('+this.mapScale+')'; this.scheduleLabels(); }
-  centerMap(lat,lng){ if(!this.mapView) return; const r=this.mapView.getBoundingClientRect(); this.mapScale=2.0; const px=(lng+180)/360*1400, py=(90-lat)/180*700; this.mapX=r.width/2-px*this.mapScale; this.mapY=r.height/2-py*this.mapScale; this.clampMap(); this.applyMapTransform(); }
+  centerMap(lat,lng){ if(!this.mapView) return; const W=this.mapView.clientWidth, H=this.mapView.clientHeight; this.mapScale=2.0; const px=(lng+180)/360*1400, py=(90-lat)/180*700; this.mapX=W/2-px*this.mapScale; this.mapY=H/2-py*this.mapScale; this.clampMap(); this.applyMapTransform(); }
 
   // ---------- interactions ----------
   toggleNight=()=>{ const night=!this.state.night; this.setState({night}); if(this.globe) this.globe.material= night?this.nightMat:this.dayMat; };
