@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/topojson-client@3/dist/topojson-client.min.js"></script>
+<script src="https://unpkg.com/three@0.136.0/build/three.min.js"></script>
+<script src="https://unpkg.com/three@0.136.0/examples/js/controls/OrbitControls.js"></script>
+<style>
+  html,body{margin:0;padding:0;height:100%;background:#0b1024;overflow:hidden;}
+  @keyframes gx-pop{0%{transform:scale(.6);opacity:0}60%{transform:scale(1.08)}100%{transform:scale(1);opacity:1}}
+  @keyframes gx-stampin{0%{transform:scale(2.4) rotate(-18deg);opacity:0}70%{transform:scale(.92) rotate(-12deg);opacity:1}100%{transform:scale(1) rotate(-12deg);opacity:1}}
+  @keyframes gx-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+  @keyframes gx-twinkle{0%,100%{opacity:.25}50%{opacity:.9}}
+  .gx-pin:hover{transform:translate(-50%,-100%) scale(1.18);}
+  .gx-pin:hover .gx-pinlabel{opacity:1;}
+</style>
+</helmet>
+
+<div style="position:fixed; inset:0; font-family:Nunito,sans-serif; color:#eaf0ff; background:radial-gradient(circle at 72% 18%, rgba(91,141,239,.22), transparent 55%), #0b1024; user-select:none;">
+
+  <!-- 3D mount -->
+  <div ref="{{ setMount }}" style="position:absolute; inset:0; z-index:1; cursor:grab;"></div>
+
+  <!-- top bar -->
+  <div style="position:absolute; top:0; left:0; right:0; z-index:6; display:flex; justify-content:space-between; align-items:center; padding:18px 22px; pointer-events:none;">
+    <div style="display:flex; align-items:center; gap:14px; pointer-events:auto;">
+      <div style="font-family:Fredoka,sans-serif; font-size:22px; font-weight:600; letter-spacing:.3px; text-shadow:0 2px 12px rgba(0,0,0,.5);">🌍 Globe Explorer</div>
+      <a href="Landing.dc.html" style="display:flex; align-items:center; gap:7px; height:38px; padding:0 15px; border-radius:999px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:#eaf0ff; text-decoration:none; font-family:Fredoka,sans-serif; font-size:14px; font-weight:500; backdrop-filter:blur(8px);">🏠 Home</a>
+    </div>
+    <div style="display:flex; gap:10px; pointer-events:auto;">
+      <button onClick="{{ backToGlobe }}" style="display:{{ backDisplay }}; align-items:center; gap:7px; height:44px; padding:0 16px; border:none; border-radius:999px; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.18); color:#eaf0ff; font-family:Fredoka,sans-serif; font-size:14px; font-weight:500; cursor:pointer; backdrop-filter:blur(8px);">↩ Back to globe</button>
+      <button onClick="{{ toggleNight }}" style="display:flex; align-items:center; gap:9px; height:44px; padding:0 16px; border:none; border-radius:999px; background:rgba(255,255,255,.08); border:1px solid rgba(46,196,182,.5); color:#9fe7df; font-family:Fredoka,sans-serif; font-size:14px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px);">{{ nightLabel }}
+        <span style="width:34px; height:18px; border-radius:99px; background:{{ nightTrack }}; position:relative; display:inline-block; transition:background .25s;"><span style="position:absolute; top:2px; left:{{ nightKnob }}; width:14px; height:14px; border-radius:50%; background:#06231f; transition:left .25s;"></span></span>
+      </button>
+    </div>
+  </div>
+
+  <!-- idle hint -->
+  <div style="position:absolute; bottom:26px; left:50%; transform:translateX(-50%); z-index:5; display:{{ hintDisplay }}; gap:18px; padding:10px 20px; border-radius:999px; background:rgba(20,26,54,.55); border:1px solid rgba(255,255,255,.1); backdrop-filter:blur(8px); font-size:13.5px; color:#c3cbf0; font-weight:600; text-align:center;">
+    🖐 Drag to spin &nbsp;·&nbsp; 🔍 Scroll to zoom &nbsp;·&nbsp; ✨ Tap the globe to dive into the map
+  </div>
+
+  <!-- passport sidebar -->
+  <div style="position:absolute; top:78px; right:22px; z-index:6; width:178px; background:rgba(16,21,44,.82); border:1px solid rgba(255,210,63,.35); border-radius:16px; padding:14px; backdrop-filter:blur(10px); box-shadow:0 12px 34px rgba(0,0,0,.4);">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div style="font-family:Fredoka,sans-serif; color:#ffd23f; font-size:13px; font-weight:600; letter-spacing:1.5px;">📖 PASSPORT</div>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(5,1fr); gap:5px; margin-top:11px; max-height:170px; overflow-y:auto;">
+      <sc-for list="{{ slots }}" as="slot" hint-placeholder-count="6">
+        <span style="aspect-ratio:1; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:13px; border:{{ slot.border }}; background:{{ slot.bg }};">{{ slot.flag }}</span>
+      </sc-for>
+    </div>
+    <div style="display:{{ emptyDisplay }}; color:#8a93c4; font-size:11px; line-height:1.4; margin-top:6px;">Tap any country on the map to earn your first stamp ✨</div>
+    <div style="color:#8a93c4; font-size:11px; margin-top:11px; font-weight:700;">{{ visitedCount }} of {{ total }} stamped</div>
+    <div style="height:6px; border-radius:99px; background:rgba(255,255,255,.08); margin-top:7px; overflow:hidden;"><div style="height:100%; width:{{ progressW }}; background:linear-gradient(90deg,#ffd23f,#ff6b6b); border-radius:99px; transition:width .5s;"></div></div>
+  </div>
+
+  <!-- dive overlay -->
+  <div ref="{{ setDive }}" style="position:absolute; inset:0; z-index:8; background:radial-gradient(circle, rgba(150,210,255,.0), #0b1024); opacity:0; pointer-events:none;"></div>
+
+  <!-- ATLAS -->
+  <sc-if value="{{ isAtlas }}" hint-placeholder-val="{{ false }}">
+    <div ref="{{ setAtlas }}" style="position:absolute; inset:0; z-index:7; background:#0b1024; animation:gx-pop .5s ease;">
+      <div ref="{{ setMapView }}" style="position:absolute; inset:0; overflow:hidden; cursor:grab; background:#07112a;">
+        <div ref="{{ setMapInner }}" style="position:absolute; top:0; left:0; width:1400px; height:700px; transform-origin:0 0; will-change:transform;">
+          <canvas ref="{{ setMapCanvas }}" style="position:absolute; top:0; left:0; width:1400px; height:700px; display:block; pointer-events:none;"></canvas>
+        </div>
+        <canvas ref="{{ setLabelCanvas }}" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:2;"></canvas>
+        <div ref="{{ setTip }}" style="position:absolute; display:none; pointer-events:none; z-index:4; background:rgba(14,20,48,.95); border:1px solid rgba(255,210,63,.45); border-radius:12px; padding:8px 12px; box-shadow:0 8px 24px rgba(0,0,0,.5); white-space:nowrap;">
+          <div style="display:flex; align-items:center; gap:7px;"><span ref="{{ setTipFlag }}" style="font-size:18px;"></span><span ref="{{ setTipName }}" style="font-family:Fredoka,sans-serif; font-size:14px; font-weight:600; color:#fff;"></span></div>
+          <div ref="{{ setTipSub }}" style="font-size:11px; color:#ffd23f; font-weight:700; margin-top:2px;"></div>
+        </div>
+        <canvas ref="{{ setConfetti }}" style="position:absolute; inset:0; width:100%; height:100%; pointer-events:none; z-index:6;"></canvas>
+
+        <!-- top-left: back link only -->
+        <div style="position:absolute; top:22px; left:22px; z-index:5;">
+          <button onClick="{{ backToGlobe }}" style="display:flex; align-items:center; gap:8px; height:44px; padding:0 20px; border:none; border-radius:999px; background:rgba(13,18,42,.85); border:1px solid rgba(46,196,182,.55); color:#9fe7df; font-family:Fredoka,sans-serif; font-size:14.5px; font-weight:600; cursor:pointer; backdrop-filter:blur(8px); box-shadow:0 6px 20px rgba(0,0,0,.28);">← Back to Spinning Globe</button>
+        </div>
+
+        <!-- quiz HUD -->
+        <div style="display:{{ quizHudDisplay }}; position:absolute; top:70px; left:50%; transform:translateX(-50%); z-index:5; width:min(440px,92vw); background:rgba(13,18,42,.94); border:1px solid rgba(255,210,63,.4); border-radius:18px; padding:14px 18px; box-shadow:0 14px 40px rgba(0,0,0,.5); backdrop-filter:blur(8px); text-align:center;">
+          <div style="display:flex; justify-content:space-between; align-items:center; font-size:12px; font-weight:800; color:#8a93c4;">
+            <span>QUESTION {{ quizNum }} / {{ quizTotal }}</span>
+            <span style="color:#ffd23f;">⭐ {{ quizScore }}</span>
+            <button onClick="{{ quitQuiz }}" style="border:none; background:rgba(255,255,255,.08); color:#cdd4f5; font-size:11px; font-weight:700; padding:4px 10px; border-radius:8px; cursor:pointer;">Quit</button>
+          </div>
+          <div style="font-family:Fredoka,sans-serif; font-size:15px; color:#cdd7f5; margin-top:10px;">Tap on this country:</div>
+          <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:4px;">
+            <span style="font-size:30px;">{{ quizFlag }}</span>
+            <span style="font-family:Fredoka,sans-serif; font-size:30px; font-weight:600; color:#fff;">{{ quizTarget }}</span>
+          </div>
+          <div style="min-height:20px; margin-top:8px; font-size:13.5px; font-weight:700; color:{{ quizMsgColor }};">{{ quizMessage }}</div>
+        </div>
+
+        <!-- bottom-left: quiz -->
+        <button onClick="{{ startQuiz }}" style="display:{{ quizBtnDisplay }}; white-space:nowrap; position:absolute; bottom:24px; left:22px; z-index:4; align-items:center; gap:8px; height:48px; padding:0 22px; border:none; border-radius:999px; background:linear-gradient(180deg,#ffd23f,#f5b831); color:#3a2a00; font-family:Fredoka,sans-serif; font-size:14.5px; font-weight:600; cursor:pointer; box-shadow:0 5px 0 #c79617, 0 10px 22px rgba(0,0,0,.22);">🎯 Find-a-Country Quiz</button>
+
+        <!-- bottom-center: roam / zoom instructions -->
+        <div style="display:{{ exploreHelpDisplay }}; position:absolute; bottom:30px; left:50%; transform:translateX(-50%); z-index:3; padding:11px 22px; border-radius:999px; background:rgba(13,18,42,.8); border:1px solid rgba(255,255,255,.14); font-size:13.5px; font-weight:700; color:#dfe6ff; backdrop-filter:blur(8px); box-shadow:0 8px 22px rgba(0,0,0,.25); white-space:nowrap;">🔍 Zoom in for more cities &amp; countries · 👆 tap a country for its card</div>
+
+        <!-- bottom-right: zoom -->
+        <div style="position:absolute; bottom:24px; right:22px; z-index:4; display:flex; gap:8px;">
+          <button onClick="{{ zoomOut }}" style="width:48px; height:48px; border-radius:50%; border:none; background:rgba(13,18,42,.85); border:1px solid rgba(255,255,255,.18); color:#eaf0ff; font-size:24px; font-weight:700; cursor:pointer; backdrop-filter:blur(8px); box-shadow:0 6px 16px rgba(0,0,0,.26);">−</button>
+          <button onClick="{{ zoomIn }}" style="width:48px; height:48px; border-radius:50%; border:none; background:rgba(13,18,42,.85); border:1px solid rgba(255,255,255,.18); color:#eaf0ff; font-size:24px; font-weight:700; cursor:pointer; backdrop-filter:blur(8px); box-shadow:0 6px 16px rgba(0,0,0,.26);">+</button>
+        </div>
+      </div>
+
+      <!-- quiz finish -->
+      <sc-if value="{{ quizDone }}" hint-placeholder-val="{{ false }}">
+        <div style="position:absolute; inset:0; z-index:8; display:flex; align-items:center; justify-content:center; background:rgba(7,11,26,.7); backdrop-filter:blur(4px);">
+          <div style="width:min(380px,90vw); background:#0e1430; border:1px solid rgba(255,210,63,.45); border-radius:24px; padding:28px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,.6); animation:gx-pop .4s ease;">
+            <div style="font-size:56px;">{{ quizMedal }}</div>
+            <div style="font-family:Fredoka,sans-serif; font-size:24px; font-weight:600; color:#fff; margin-top:8px;">{{ quizFinalTitle }}</div>
+            <div style="font-size:15px; color:#cdd4f5; margin-top:8px; line-height:1.4;">You found <b style="color:#ffd23f;">{{ quizScore }}</b> of {{ quizTotal }} on the first try!</div>
+            <div style="display:flex; gap:10px; justify-content:center; margin-top:20px;">
+              <button onClick="{{ startQuiz }}" style="height:48px; padding:0 22px; border:none; border-radius:16px; background:#ffd23f; color:#3a2a00; font-family:Fredoka,sans-serif; font-size:15px; font-weight:600; cursor:pointer; box-shadow:0 6px 0 #c79a17;">Play again</button>
+              <button onClick="{{ quitQuiz }}" style="height:48px; padding:0 22px; border:none; border-radius:16px; background:rgba(255,255,255,.1); color:#eaf0ff; font-family:Fredoka,sans-serif; font-size:15px; font-weight:600; cursor:pointer;">Back to map</button>
+            </div>
+          </div>
+        </div>
+      </sc-if>
+    </div>
+  </sc-if>
+
+  <!-- COUNTRY 3-CARD SHEET -->
+  <sc-if value="{{ hasSelected }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; z-index:9; display:flex; align-items:flex-end; justify-content:center; background:rgba(7,11,26,.55); backdrop-filter:blur(3px);" onClick="{{ closeCountry }}">
+      <div onClick="{{ stop }}" style="width:min(960px,94vw); margin-bottom:22px; background:#0e1430; border:1px solid rgba(255,255,255,.1); border-radius:24px; padding:20px; box-shadow:0 24px 60px rgba(0,0,0,.6); animation:gx-pop .35s ease;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+          <div style="display:flex; align-items:center; gap:12px;">
+            <span style="font-size:34px;">{{ sel.flag }}</span>
+            <div>
+              <div style="font-family:Fredoka,sans-serif; font-size:24px; font-weight:600; line-height:1;">{{ sel.name }}</div>
+              <div style="color:#8a93c4; font-size:13px; font-weight:700; margin-top:3px;">{{ sel.region }}</div>
+            </div>
+          </div>
+          <button onClick="{{ closeCountry }}" style="width:44px; height:44px; border-radius:50%; border:none; background:rgba(255,255,255,.08); color:#eaf0ff; font-size:20px; cursor:pointer;">✕</button>
+        </div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:14px;">
+          <!-- where -->
+          <div style="background:#141a36; border:1px solid rgba(91,141,239,.3); border-radius:16px; padding:14px;">
+            <div style="font-size:11px; color:#5b8def; font-weight:800; letter-spacing:.6px;">WHERE ON EARTH?</div>
+            <canvas ref="{{ setWhere }}" style="width:100%; height:108px; border-radius:11px; margin-top:10px; display:block;"></canvas>
+            <div style="display:flex; gap:6px; flex-wrap:wrap; margin-top:10px;">
+              <span style="font-size:11.5px; font-weight:700; color:#bcd0ff; background:rgba(91,141,239,.16); border-radius:8px; padding:3px 9px;">📍 {{ sel.region }}</span>
+              <span style="font-size:11.5px; font-weight:700; color:#bcd0ff; background:rgba(91,141,239,.16); border-radius:8px; padding:3px 9px;">{{ sel.hemi }}</span>
+            </div>
+            <div style="color:#8a93c4; font-size:12px; margin-top:8px; font-weight:700;">{{ sel.eqLine }}</div>
+          </div>
+          <!-- live local time -->
+          <div style="background:#141a36; border:1px solid rgba(46,196,182,.3); border-radius:16px; padding:14px;">
+            <div style="font-size:11px; color:#2ec4b6; font-weight:800; letter-spacing:.6px;">WHAT TIME IS IT THERE?</div>
+            <div style="display:flex; align-items:center; justify-content:center; gap:10px; margin-top:14px;">
+              <span style="font-size:30px;">{{ sel.dayIcon }}</span>
+              <span style="font-family:Fredoka,sans-serif; font-size:40px; font-weight:600; line-height:1; color:#fff; font-variant-numeric:tabular-nums;">{{ sel.localTime }}</span>
+            </div>
+            <div style="text-align:center; font-family:Fredoka,sans-serif; font-size:14px; color:#7fe3d3; margin-top:8px;">{{ sel.dayLabel }} in {{ sel.capital }}</div>
+            <div style="text-align:center; font-family:Nunito,sans-serif; font-size:12px; font-weight:700; letter-spacing:.4px; color:#8a93c4; margin-top:5px;">🕒 {{ sel.tzLabel }}</div>
+            <div style="color:#8a93c4; font-size:12px; margin-top:8px; font-weight:700; text-align:center; line-height:1.35;">{{ sel.sunLine }}</div>
+          </div>
+          <!-- fun fact scratch -->
+          <div style="background:#141a36; border:1px solid rgba(255,210,63,.4); border-radius:16px; padding:14px;">
+            <div style="font-size:11px; color:#ffd23f; font-weight:800; letter-spacing:.6px;">FUN FACT</div>
+            <div style="position:relative; height:118px; margin-top:10px; border-radius:11px; overflow:hidden;">
+              <div style="position:absolute; inset:0; padding:12px; display:flex; align-items:center; justify-content:center; text-align:center; font-family:Fredoka,sans-serif; font-size:14px; line-height:1.3; color:#fff; background:linear-gradient(135deg,#3a2f63,#5b3a8f);">{{ sel.fact }}</div>
+              <canvas ref="{{ setScratch }}" style="position:absolute; inset:0; width:100%; height:100%; cursor:grab; touch-action:none;"></canvas>
+            </div>
+            <div style="color:#8a93c4; font-size:11.5px; margin-top:9px; font-weight:700; text-align:center;">{{ scratchHint }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- SECRET CARD -->
+  <sc-if value="{{ hasSecret }}" hint-placeholder-val="{{ false }}">
+    <div style="position:absolute; inset:0; z-index:10; display:flex; align-items:center; justify-content:center; background:rgba(7,11,26,.6); backdrop-filter:blur(3px);" onClick="{{ closeSecret }}">
+      <div onClick="{{ stop }}" style="width:min(360px,90vw); background:#0e1430; border:1px solid rgba(255,210,63,.45); border-radius:24px; padding:26px; text-align:center; box-shadow:0 24px 60px rgba(0,0,0,.6); animation:gx-pop .4s ease;">
+        <div style="font-size:54px; animation:gx-float 3s ease-in-out infinite;">{{ secret.emoji }}</div>
+        <div style="font-family:Fredoka,sans-serif; color:#ffd23f; font-size:13px; font-weight:600; letter-spacing:2px; margin-top:8px;">✨ SECRET UNLOCKED</div>
+        <div style="font-family:Fredoka,sans-serif; font-size:19px; line-height:1.3; margin-top:12px;">{{ secret.text }}</div>
+        <button onClick="{{ closeSecret }}" style="margin-top:20px; height:48px; padding:0 26px; border:none; border-radius:16px; background:#ffd23f; color:#3a2a00; font-family:Fredoka,sans-serif; font-size:16px; font-weight:600; cursor:pointer; box-shadow:0 6px 0 #c79a17;">Cool!</button>
+      </div>
+    </div>
+  </sc-if>
+
+  <!-- footer credit -->
+  <div style="position:absolute; left:0; right:0; bottom:7px; z-index:5; text-align:center; pointer-events:none; font-family:Nunito,sans-serif; font-size:13px; font-weight:600; color:#8a90ad; text-shadow:0 1px 4px rgba(0,0,0,.4);">created by <span style="color:#2ec4b6; font-weight:800;">@chetandudhane</span></div>
+
+  <!-- loading -->
+  <div ref="{{ setLoad }}" style="position:absolute; inset:0; z-index:11; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#0b1024; gap:16px;">
+    <div style="font-size:46px; animation:gx-float 2.4s ease-in-out infinite;">🌍</div>
+    <div style="font-family:Fredoka,sans-serif; font-size:16px; color:#9fe7df; letter-spacing:.5px;">Spinning up the world…</div>
+  </div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:&quot;100%&quot;,&quot;height&quot;:&quot;100%&quot;}}">
+class Component extends DCLogic {
+  constructor(props){
+    super(props);
+    let visited = [];
+    try { visited = JSON.parse(localStorage.getItem('gx_passport')||'[]'); } catch(e){}
+    this.COUNTRIES = []; this.MEGACITIES = []; this.MINORCITIES = [];
+    this.labelCountries = []; this.labelCities = []; this.clickable = []; this.placedLabels = [];
+    this.mapX=0; this.mapY=0; this.mapScale=1; this.hoverFeature=null;
+    this.state = { phase:'globe', night:false, selected:null, secret:null, visited, scratchDone:false, total:0, mapTheme:'day', clockTick:0, quiz:null };
+  }
+
+  // ---------- data ----------
+  buildCountries(){
+    const raw = [
+      ['Japan','🇯🇵',35.68,139.69,'Tokyo','Osaka, Kyoto','East Asia','Japan is made of over 6,800 islands — only about 430 have people living on them!'],
+      ['Brazil','🇧🇷',-15.79,-47.88,'Brasília','São Paulo, Rio','South America','The Amazon rainforest here makes about 1 in every 5 breaths of oxygen on Earth.'],
+      ['Egypt','🇪🇬',30.04,31.24,'Cairo','Alexandria, Giza','North Africa','The Great Pyramid was the tallest building on Earth for 3,800 years.'],
+      ['Australia','🇦🇺',-35.28,149.13,'Canberra','Sydney, Melbourne','Oceania','Australia is actually wider than the Moon!'],
+      ['Canada','🇨🇦',45.42,-75.70,'Ottawa','Toronto, Vancouver','North America','Canada has more lakes than the rest of the world combined.'],
+      ['India','🇮🇳',28.61,77.21,'New Delhi','Mumbai, Bengaluru','South Asia','India has the rainiest village on Earth — Mawsynram gets ~12 metres of rain a year.'],
+      ['France','🇫🇷',48.85,2.35,'Paris','Marseille, Lyon','Western Europe','With its islands around the world, France touches 12 different time zones.'],
+      ['Kenya','🇰🇪',-1.29,36.82,'Nairobi','Mombasa','East Africa','Over a million wildebeest cross Kenya each year in the Great Migration.'],
+      ['Norway','🇳🇴',59.91,10.75,'Oslo','Bergen','Northern Europe','In summer the Sun never fully sets here for weeks — the Midnight Sun!'],
+      ['Mexico','🇲🇽',19.43,-99.13,'Mexico City','Guadalajara','North America','Mexico City is slowly sinking — about 50 cm every year.'],
+      ['China','🇨🇳',39.90,116.41,'Beijing','Shanghai','East Asia','The Great Wall of China is more than 21,000 km long.'],
+      ['Iceland','🇮🇸',64.15,-21.94,'Reykjavík','Akureyri','Northern Europe','Iceland has zero mosquitoes — one of the only countries on Earth without them.'],
+      ['Peru','🇵🇪',-12.05,-77.04,'Lima','Cusco','South America','Machu Picchu was built high in the Andes without wheels or iron tools.'],
+      ['South Africa','🇿🇦',-25.75,28.19,'Pretoria','Cape Town, Joburg','Southern Africa','South Africa is the only country with three capital cities!'],
+      ['Italy','🇮🇹',41.90,12.50,'Rome','Milan, Naples','Southern Europe','Rome has free drinking fountains on almost every street — over 2,500 of them.'],
+      ['United States','🇺🇸',38.90,-77.04,'Washington','New York, L.A.','North America','Yellowstone Park sits on top of a giant sleeping supervolcano.'],
+      ['Russia','🇷🇺',55.75,37.62,'Moscow','St Petersburg','Eurasia','Russia is so wide it stretches across 11 time zones.'],
+      ['Indonesia','🇮🇩',-6.21,106.85,'Jakarta','Surabaya','Southeast Asia','Indonesia is built from more than 17,000 islands.'],
+      ['Greece','🇬🇷',37.98,23.73,'Athens','Thessaloniki','Southern Europe','Greece has around 6,000 islands — but people live on only 227 of them.'],
+      ['Argentina','🇦🇷',-34.60,-58.38,'Buenos Aires','Córdoba','South America','Buenos Aires has the widest avenue in the world — 16 lanes!'],
+      ['Thailand','🇹🇭',13.76,100.50,'Bangkok','Chiang Mai','Southeast Asia','Bangkok’s full ceremonial name is the longest city name on Earth.'],
+      ['Morocco','🇲🇦',34.02,-6.83,'Rabat','Casablanca','North Africa','Morocco has an entire city painted blue — and the edge of the Sahara.'],
+      ['New Zealand','🇳🇿',-41.29,174.78,'Wellington','Auckland','Oceania','There are about 5 sheep for every single person in New Zealand.'],
+      ['Germany','🇩🇪',52.52,13.40,'Berlin','Munich, Hamburg','Western Europe','Some German highways, the Autobahn, have no speed limit at all.'],
+      ['UAE','🇦🇪',24.45,54.38,'Abu Dhabi','Dubai','Middle East','Dubai has the tallest building on Earth — the Burj Khalifa, 828 m high.'],
+      ['Spain','🇪🇸',40.42,-3.70,'Madrid','Barcelona','Southern Europe','Spain throws 150,000 kg of tomatoes in one giant food fight each year!'],
+      ['Tanzania','🇹🇿',-6.79,39.21,'Dodoma','Dar es Salaam','East Africa','Mount Kilimanjaro is the tallest free-standing mountain on Earth.'],
+      ['Chile','🇨🇱',-33.45,-70.67,'Santiago','Valparaíso','South America','The Atacama Desert here can go decades without a single drop of rain.']
+    ];
+    return raw.map(r=>({ name:r[0], flag:r[1], lat:r[2], lng:r[3], capital:r[4], cities:r[5], region:r[6], fact:r[7] }));
+  }
+  secrets(){ return [
+    { emoji:'🛰️', text:'A satellite zooms around Earth every 90 minutes — that’s 16 sunrises every day!' },
+    { emoji:'🎈', text:'The highest balloon flight ever reached the edge of space — about 41 km up.' },
+    { emoji:'🐋', text:'A blue whale’s heart is so big a small child could crawl through its arteries.' }
+  ]; }
+
+  // ---------- audio (per CLAUDE.md) ----------
+  ensureAudio(){ if(!this.actx){ try{ this.actx=new (window.AudioContext||window.webkitAudioContext)(); }catch(e){ return null; } } if(this.actx && this.actx.state==='suspended') this.actx.resume(); return this.actx; }
+  installAudioUnlock(){
+    this._unlock=()=>{ const a=this.ensureAudio(); if(a){ const b=a.createBuffer(1,1,22050); const s=a.createBufferSource(); s.buffer=b; s.connect(a.destination); s.start(0); } this.removeAudioUnlock(); };
+    ['pointerdown','touchstart','mousedown','keydown'].forEach(e=>window.addEventListener(e,this._unlock,{passive:true}));
+  }
+  removeAudioUnlock(){ if(!this._unlock) return; ['pointerdown','touchstart','mousedown','keydown'].forEach(e=>window.removeEventListener(e,this._unlock)); this._unlock=null; }
+  whoosh(){ const a=this.ensureAudio(); if(!a) return; const dur=0.95, sr=a.sampleRate; const buf=a.createBuffer(1,sr*dur,sr); const d=buf.getChannelData(0); for(let i=0;i<d.length;i++) d[i]=(Math.random()*2-1); const src=a.createBufferSource(); src.buffer=buf; const f=a.createBiquadFilter(); f.type='bandpass'; f.Q.value=0.8; const t=a.currentTime; f.frequency.setValueAtTime(300,t); f.frequency.exponentialRampToValueAtTime(2600,t+dur*0.55); f.frequency.exponentialRampToValueAtTime(180,t+dur); const g=a.createGain(); g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(0.3,t+0.16); g.gain.exponentialRampToValueAtTime(0.0001,t+dur); src.connect(f); f.connect(g); g.connect(a.destination); src.start(); }
+  stamp(){ const a=this.ensureAudio(); if(!a) return; const t=a.currentTime; const o=a.createOscillator(); o.type='sine'; o.frequency.setValueAtTime(160,t); o.frequency.exponentialRampToValueAtTime(60,t+0.13); const g=a.createGain(); g.gain.setValueAtTime(0.5,t); g.gain.exponentialRampToValueAtTime(0.001,t+0.18); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+0.2); }
+  ding(){ const a=this.ensureAudio(); if(!a) return; const t=a.currentTime; [880,1320].forEach((fr,i)=>{ const o=a.createOscillator(); o.type='triangle'; o.frequency.value=fr; const g=a.createGain(); const s=t+i*0.07; g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.22,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+0.4); o.connect(g); g.connect(a.destination); o.start(s); o.stop(s+0.42); }); }
+  cheer(){ const a=this.ensureAudio(); if(!a) return; const t=a.currentTime; [523,659,784,1047].forEach((fr,i)=>{ const o=a.createOscillator(); o.type='triangle'; o.frequency.value=fr; const g=a.createGain(); const s=t+i*0.09; g.gain.setValueAtTime(0.0001,s); g.gain.exponentialRampToValueAtTime(0.26,s+0.02); g.gain.exponentialRampToValueAtTime(0.0001,s+0.55); o.connect(g); g.connect(a.destination); o.start(s); o.stop(s+0.6); }); }
+  buzz(){ const a=this.ensureAudio(); if(!a) return; const t=a.currentTime; const o=a.createOscillator(); o.type='square'; o.frequency.setValueAtTime(150,t); o.frequency.linearRampToValueAtTime(90,t+0.32); const g=a.createGain(); g.gain.setValueAtTime(0.2,t); g.gain.setValueAtTime(0.2,t+0.28); g.gain.exponentialRampToValueAtTime(0.001,t+0.36); o.connect(g); g.connect(a.destination); o.start(t); o.stop(t+0.38); }
+
+  // ---------- lifecycle ----------
+  componentDidMount(){
+    this.installAudioUnlock();
+    this._onResize=()=>this.onResize();
+    window.addEventListener('resize',this._onResize);
+    this.waitForThree(0);
+    this.loadWorld(0);
+  }
+
+  // ---------- political world map ----------
+  loadWorld(tries){
+    if(this.mapReady||this._mapLoading) return;
+    this._mapLoading=true;
+    Promise.all([
+      fetch('https://cdn.jsdelivr.net/gh/johan/world.geo.json@master/countries.geo.json').then(r=>r.json()),
+      import('./world-data.js')
+    ]).then(([j,data])=>{
+      this.world=j.features;
+      this.COUNTRIES=data.COUNTRIES; this.MEGACITIES=data.MEGACITIES; this.MINORCITIES=data.MINORCITIES||[];
+      this.TZ=data.TZ||{}; this.COUNTRIES.forEach(c=>{ if(this.TZ[c.name]) c.tz=this.TZ[c.name]; });
+      this.matchData();
+      this.buildOffscreen();
+      this.mapReady=true;
+      this.setState({total:this.COUNTRIES.length});
+      if(this.mapCanvas) this.drawAtlas();
+      if(this.labelCanvas) this.renderLabels();
+      if(this.whereCanvas) this.drawWhere();
+    }).catch((e)=>{ this._mapLoading=false; });
+  }
+  matchData(){
+    const norm=s=>String(s||'').toLowerCase().replace(/[^a-z]/g,'');
+    const byName={};
+    this.world.forEach(f=>{ this._bbox(f); const n=norm(f.properties&&f.properties.name); if(n&&!byName[n]) byName[n]=f; });
+    this.labelCountries=[]; this.labelCities=[]; this.clickable=[];
+    this.COUNTRIES.forEach(c=>{
+      let f=byName[norm(c.name)];
+      if(!f){ for(const a of (c.aliases||[])){ f=byName[norm(a)]; if(f) break; } }
+      if(f){ f.__country=c; const ce=this._centroid(f); c.cx=ce[0]; c.cy=ce[1]; this.clickable.push(f); }
+      else { c.cx=c.capLng; c.cy=c.capLat; }
+      this.labelCountries.push({ name:c.name, short:c.short, cx:c.cx, cy:c.cy, rank:c.rank, ref:c });
+      this.labelCities.push({ name:c.capital, lng:c.capLng, lat:c.capLat, rank:c.rank, capital:true });
+    });
+    this.MEGACITIES.forEach(m=>this.labelCities.push({ name:m.name, lng:m.lng, lat:m.lat, rank:m.rank, capital:false }));
+    (this.MINORCITIES||[]).forEach(m=>this.labelCities.push({ name:m.name, lng:m.lng, lat:m.lat, rank:m.rank, capital:false, minor:true }));
+  }
+  _bbox(f){ const g=f.geometry; if(!g) return; let mnx=180,mny=90,mxx=-180,mxy=-90; const scan=ring=>ring.forEach(p=>{ if(p[0]<mnx)mnx=p[0]; if(p[0]>mxx)mxx=p[0]; if(p[1]<mny)mny=p[1]; if(p[1]>mxy)mxy=p[1]; }); if(g.type==='Polygon') g.coordinates.forEach(scan); else if(g.type==='MultiPolygon') g.coordinates.forEach(poly=>poly.forEach(scan)); f.__bbox=[mnx,mny,mxx,mxy]; }
+  _centroid(f){ const lr=this.largestRing(f.geometry); if(!lr.ring) return [0,0]; let sx=0,sy=0; lr.ring.forEach(p=>{ sx+=p[0]; sy+=p[1]; }); return [sx/lr.ring.length, sy/lr.ring.length]; }
+  _ringHit(ring,lng,lat){ let inside=false; for(let i=0,j=ring.length-1;i<ring.length;j=i++){ const xi=ring[i][0],yi=ring[i][1],xj=ring[j][0],yj=ring[j][1]; if(((yi>lat)!==(yj>lat)) && (lng < (xj-xi)*(lat-yi)/(yj-yi)+xi)) inside=!inside; } return inside; }
+  pointInFeature(f,lng,lat){ const b=f.__bbox; if(b&&(lng<b[0]||lng>b[2]||lat<b[1]||lat>b[3])) return false; const g=f.geometry; if(!g) return false; if(g.type==='Polygon'){ return this._ringHit(g.coordinates[0],lng,lat); } if(g.type==='MultiPolygon'){ for(const poly of g.coordinates){ if(this._ringHit(poly[0],lng,lat)) return true; } } return false; }
+  featureAt(lng,lat){ for(const f of this.clickable){ if(this.pointInFeature(f,lng,lat)) return f; } return null; }
+  largestRing(g){ let best=null,ba=-1; const polys = g.type==='Polygon'?[g.coordinates]:g.coordinates; polys.forEach(poly=>{ const ring=poly[0]; let a=0; for(let i=0;i<ring.length-1;i++){ a+=ring[i][0]*ring[i+1][1]-ring[i+1][0]*ring[i][1]; } a=Math.abs(a); if(a>ba){ ba=a; best=ring; } }); return {ring:best,area:ba}; }
+  buildOffscreen(){
+    const day = this.state.mapTheme==='day';
+    const W=3600,H=1800; const cv=document.createElement('canvas'); cv.width=W; cv.height=H; const ctx=cv.getContext('2d');
+    const proj=(lng,lat)=>[ (lng+180)/360*W, (90-lat)/180*H ];
+    ctx.fillStyle = day?'#a9d4ec':'#0a1631'; ctx.fillRect(0,0,W,H);
+    ctx.strokeStyle = day?'rgba(30,70,110,.12)':'rgba(255,255,255,.05)'; ctx.lineWidth=1.5;
+    for(let lng=-150;lng<=150;lng+=30){ ctx.beginPath(); const a=proj(lng,90),b=proj(lng,-90); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); }
+    for(let lat=-60;lat<=60;lat+=30){ ctx.beginPath(); const a=proj(-180,lat),b=proj(180,lat); ctx.moveTo(a[0],a[1]); ctx.lineTo(b[0],b[1]); ctx.stroke(); }
+    const pal = day
+      ? ['#cfe6a8','#bfe09a','#e7dca6','#d6e8ad','#cce4b6','#e3d6a0','#c6e2bc','#dde0a4','#c4e0cc','#ecdebc']
+      : ['#23456e','#2b5145','#3a3066','#4c3145','#2f5152','#454024','#26513f','#3d2748','#324a6b','#503a3a'];
+    const border = day?'rgba(70,100,130,.55)':'rgba(150,180,235,.55)';
+    const trace=(rings)=>{ rings.forEach(ring=>{ ring.forEach((pt,i)=>{ const p=proj(pt[0],pt[1]); if(i===0) ctx.moveTo(p[0],p[1]); else ctx.lineTo(p[0],p[1]); }); ctx.closePath(); }); };
+    this.world.forEach((f,i)=>{ const g=f.geometry; if(!g) return; ctx.beginPath(); if(g.type==='Polygon') trace(g.coordinates); else if(g.type==='MultiPolygon') g.coordinates.forEach(poly=>trace(poly)); ctx.fillStyle=pal[i%pal.length]; ctx.fill(); ctx.lineWidth=1.6; ctx.strokeStyle=border; ctx.stroke(); });
+    this.offscreen=cv;
+  }
+  applyMapTheme(){ const day=this.state.mapTheme==='day'; if(this.mapView) this.mapView.style.background=day?'#a9d4ec':'#07112a'; if(this.atlasEl) this.atlasEl.style.background=day?'#d7e8f3':'#0b1024'; }
+  toggleMapTheme=()=>{ this.setState(s=>({mapTheme:s.mapTheme==='day'?'night':'day'}), ()=>{ this.buildOffscreen(); this.drawAtlas(); this.renderLabels(); this.drawWhere(); this.applyMapTheme(); }); };
+  // ---------- projection ----------
+  geoToScreen(lng,lat){ return { x:this.mapX+(lng+180)/360*1400*this.mapScale, y:this.mapY+(90-lat)/180*700*this.mapScale }; }
+  screenToGeo(px,py){ return { lng:((px-this.mapX)/(1400*this.mapScale))*360-180, lat:90-((py-this.mapY)/(700*this.mapScale))*180 }; }
+
+  // ---------- dynamic labels (Google-Maps style LOD + collision) ----------
+  scheduleLabels(){ if(this._lblRaf) return; this._lblRaf=requestAnimationFrame(()=>{ this._lblRaf=null; this.renderLabels(); }); }
+  renderLabels(){
+    const cv=this.labelCanvas, view=this.mapView; if(!cv||!view||!this.mapReady) return;
+    const r=view.getBoundingClientRect(); const dpr=Math.min(devicePixelRatio||1,2);
+    const ww=Math.round(r.width*dpr), hh=Math.round(r.height*dpr);
+    if(cv.width!==ww||cv.height!==hh){ cv.width=ww; cv.height=hh; }
+    const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,r.width,r.height);
+    const W=r.width, H=r.height, sc=this.mapScale;
+    const day=this.state.mapTheme==='day';
+    const halo = day?'rgba(255,255,255,.92)':'rgba(4,8,20,.92)';
+    const cText = day?'#16203f':'rgba(255,255,255,.95)';
+    const capText = day?'#7a5300':'#ffe27a';
+    const cityText = day?'#2c3a5a':'#cdd7f5';
+    const cityDot = day?'#2c3a5a':'#dfe7ff';
+    const minorText = day?'#5d6b86':'#9aa6cf';
+    const minorDot = day?'#7b8aa6':'#aab4d8';
+    // hover highlight
+    if(this.hoverFeature) this.drawHighlight(ctx,this.hoverFeature);
+    if(this.state.quiz && this.state.quiz.active) return; // no labels during quiz
+    const countryMax = sc<1.25?1 : sc<1.7?2 : sc<2.5?3 : 4;
+    const cityMax = sc<1.6?0 : sc<2.25?1 : sc<2.9?2 : sc<3.7?3 : 4;
+    const placed=[]; this.placedLabels=[];
+    const fits=(x,y,w,h)=>{ for(const p of placed){ if(x<p.x+p.w+3 && x+w+3>p.x && y<p.y+p.h+3 && y+h+3>p.y) return false; } return true; };
+    ctx.textBaseline='middle';
+    // countries (priority)
+    this.labelCountries.filter(c=>c.rank<=countryMax).sort((a,b)=>a.rank-b.rank).forEach(c=>{
+      const s=this.geoToScreen(c.cx,c.cy); if(s.x<-30||s.x>W+30||s.y<-16||s.y>H+16) return;
+      const fs=c.rank===1?15:c.rank===2?13.5:c.rank===3?12:10.5; ctx.font='700 '+fs+'px Fredoka, sans-serif';
+      const t=(c.short||c.name).toUpperCase(); const w=ctx.measureText(t).width, h=fs+2; const x=s.x-w/2, y=s.y-h/2;
+      if(!fits(x,y,w,h)) return; placed.push({x,y,w,h}); this.placedLabels.push({x,y,w,h,country:c.ref});
+      ctx.textAlign='center'; ctx.lineWidth=3.5; ctx.strokeStyle=halo; ctx.fillStyle=cText;
+      ctx.strokeText(t,s.x,s.y); ctx.fillText(t,s.x,s.y);
+    });
+    // capitals + megacities
+    ctx.textAlign='left';
+    this.labelCities.filter(c=>c.rank<=cityMax).sort((a,b)=>a.rank-b.rank).forEach(c=>{
+      if(!c.name) return; const s=this.geoToScreen(c.lng,c.lat); if(s.x<0||s.x>W||s.y<0||s.y>H) return;
+      const fs=c.capital?12:c.minor?10.5:11; ctx.font=(c.capital?'700 ':'600 ')+fs+'px Nunito, sans-serif';
+      const w=ctx.measureText(c.name).width+12, h=14; const x=s.x-4, y=s.y-h/2;
+      if(!fits(x,y,w,h)) return; placed.push({x,y,w,h});
+      if(c.capital){ ctx.fillStyle='#ffd23f'; ctx.strokeStyle='#1f1500'; ctx.lineWidth=1; ctx.beginPath(); ctx.rect(s.x-4,s.y-4,8,8); ctx.fill(); ctx.stroke(); }
+      else { ctx.fillStyle=c.minor?minorDot:cityDot; ctx.beginPath(); ctx.arc(s.x,s.y,c.minor?2.2:3,0,6.283); ctx.fill(); }
+      ctx.lineWidth=3; ctx.strokeStyle=halo; ctx.fillStyle=c.capital?capText:(c.minor?minorText:cityText);
+      ctx.strokeText(c.name,s.x+8,s.y); ctx.fillText(c.name,s.x+8,s.y);
+    });
+  }
+  drawHighlight(ctx,f){
+    const g=f.geometry; if(!g) return; ctx.save(); ctx.beginPath();
+    const trace=(ring)=>{ ring.forEach((pt,i)=>{ const s=this.geoToScreen(pt[0],pt[1]); if(i===0) ctx.moveTo(s.x,s.y); else ctx.lineTo(s.x,s.y); }); ctx.closePath(); };
+    if(g.type==='Polygon') g.coordinates.forEach(trace); else if(g.type==='MultiPolygon') g.coordinates.forEach(poly=>poly.forEach(trace));
+    ctx.fillStyle='rgba(255,210,63,.28)'; ctx.fill(); ctx.lineWidth=2.5; ctx.strokeStyle='#ffd23f'; ctx.stroke(); ctx.restore();
+  }
+  cities(){ return [
+    ['Tokyo',35.68,139.69,1],['Delhi',28.61,77.21,1],['Shanghai',31.23,121.47,0],['São Paulo',-23.55,-46.63,0],['Mexico City',19.43,-99.13,1],['Cairo',30.04,31.24,1],['Mumbai',19.08,72.88,0],['Beijing',39.90,116.41,1],['Dhaka',23.81,90.41,1],['Osaka',34.69,135.50,0],['New York',40.71,-74.01,0],['Karachi',24.86,67.01,0],['Buenos Aires',-34.60,-58.38,1],['Istanbul',41.01,28.98,0],['Kolkata',22.57,88.36,0],['Manila',14.60,120.98,1],['Lagos',6.52,3.38,0],['Rio de Janeiro',-22.91,-43.17,0],['Los Angeles',34.05,-118.24,0],['Moscow',55.75,37.62,1],['Paris',48.85,2.35,1],['London',51.51,-0.13,1],['Jakarta',-6.21,106.85,1],['Lima',-12.05,-77.04,1],['Bangkok',13.76,100.50,1],['Seoul',37.57,126.98,1],['Bogotá',4.71,-74.07,1],['Tehran',35.69,51.39,1],['Chicago',41.88,-87.63,0],['Nairobi',-1.29,36.82,1],['Johannesburg',-26.20,28.05,0],['Lahore',31.55,74.34,0],['Bengaluru',12.97,77.59,0],['Ho Chi Minh City',10.82,106.63,0],['Chennai',13.08,80.27,0],['Hyderabad',17.39,78.49,0],['Hong Kong',22.32,114.17,0],['Singapore',1.35,103.82,1],['Madrid',40.42,-3.70,1],['Toronto',43.65,-79.38,0],['Sydney',-33.87,151.21,0],['Berlin',52.52,13.40,1],['Rome',41.90,12.50,1],['Riyadh',24.71,46.68,1],['Santiago',-33.45,-70.67,1],['Casablanca',33.57,-7.59,0],['Addis Ababa',9.03,38.74,1],['Kinshasa',-4.32,15.31,1],['Baghdad',33.31,44.36,1],['Washington',38.90,-77.04,1],['Vancouver',49.28,-123.12,0],['Cape Town',-33.92,18.42,0],['Kuala Lumpur',3.14,101.69,1],['Dubai',25.20,55.27,0],['Abu Dhabi',24.45,54.38,1],['Athens',37.98,23.73,1],['Vienna',48.21,16.37,1],['Warsaw',52.23,21.01,1],['Kyiv',50.45,30.52,1],['Stockholm',59.33,18.06,1],['Oslo',59.91,10.75,1],['Reykjavík',64.15,-21.94,1],['Helsinki',60.17,24.94,1],['Amsterdam',52.37,4.90,1],['Brussels',50.85,4.35,1],['Lisbon',38.72,-9.14,1],['Dublin',53.35,-6.26,1],['Wellington',-41.29,174.78,1],['Auckland',-36.85,174.76,0],['Caracas',10.48,-66.90,1],['Quito',-0.18,-78.47,1],['La Paz',-16.49,-68.15,1],['Brasília',-15.79,-47.88,1],['Dakar',14.72,-17.47,1],['Accra',5.60,-0.19,1],['Algiers',36.75,3.06,1],['Khartoum',15.50,32.56,1],['Dar es Salaam',-6.79,39.21,0],['Luanda',-8.84,13.23,1],['Tashkent',41.30,69.24,1],['Almaty',43.24,76.89,0],['Ulaanbaatar',47.89,106.91,1],['Yangon',16.84,96.17,0],['Hanoi',21.03,105.85,1],['Taipei',25.03,121.57,1],['Colombo',6.93,79.86,0],['Kathmandu',27.72,85.32,1],['Kabul',34.56,69.21,1],['Islamabad',33.68,73.05,1],['Ankara',39.93,32.87,1],['Amman',31.95,35.93,1],['Doha',25.29,51.53,1],['Kuwait City',29.38,47.99,1],['Panama City',8.98,-79.52,1],['Havana',23.11,-82.37,1],['Montevideo',-34.90,-56.16,1],['Asunción',-25.30,-57.64,1],['Guatemala City',14.63,-90.51,1],['San José',9.93,-84.08,1],['Ottawa',45.42,-75.70,1],['Canberra',-35.28,149.13,1],['Pretoria',-25.75,28.19,1],['Rabat',34.02,-6.83,1],['New Delhi',28.61,77.21,0]
+  ].filter(c=>c[0]); }
+  drawAtlas(){ if(!this.mapCanvas||!this.offscreen) return; const c=this.mapCanvas; c.width=this.offscreen.width; c.height=this.offscreen.height; c.getContext('2d').drawImage(this.offscreen,0,0); }
+  drawWhere(){ const c=this.whereCanvas, sel=this.state.selected; if(!c||!sel||!this.offscreen) return; const lng=sel.capLng, lat=sel.capLat; const W=this.offscreen.width,H=this.offscreen.height; const px=(lng+180)/360*W, py=(90-lat)/180*H; let sw=W*0.18, sh=sw*(236/480); let sx=px-sw/2, sy=py-sh/2; sx=Math.max(0,Math.min(W-sw,sx)); sy=Math.max(0,Math.min(H-sh,sy)); c.width=480; c.height=236; const ctx=c.getContext('2d'); ctx.drawImage(this.offscreen,sx,sy,sw,sh,0,0,480,236); const mx=(px-sx)/sw*480, my=(py-sy)/sh*236; ctx.beginPath(); ctx.arc(mx,my,8,0,6.283); ctx.fillStyle='#ff6b6b'; ctx.fill(); ctx.lineWidth=3; ctx.strokeStyle='#fff'; ctx.stroke(); }
+  componentWillUnmount(){
+    this.removeAudioUnlock();
+    window.removeEventListener('resize',this._onResize);
+    if(this._raf) cancelAnimationFrame(this._raf);
+    if(this.controls) this.controls.dispose();
+    if(this.renderer){ this.renderer.dispose(); if(this.renderer.domElement && this.renderer.domElement.parentNode) this.renderer.domElement.parentNode.removeChild(this.renderer.domElement); }
+    if(this.actx){ try{this.actx.close();}catch(e){} }
+    this.stopClock(); if(this._confRaf) cancelAnimationFrame(this._confRaf);
+  }
+  componentDidUpdate(prevProps, prevState){
+    try{
+      const prevPhase = prevState && prevState.phase;
+      if(this.state.phase!==prevPhase){
+        if(this.controls) this.controls.enabled = this.state.phase==='globe';
+        if(this.state.phase==='atlas'){ requestAnimationFrame(()=>{ try{ this.applyMapTheme(); if(this.mapReady){ this.drawAtlas(); this.renderLabels(); } if(this._pendingCenter){ this.centerMap(this._pendingCenter.lat,this._pendingCenter.lng); this._pendingCenter=null; } }catch(e){} }); }
+      }
+      if(this.state.selected && this.state.selected!==(prevState&&prevState.selected)){ requestAnimationFrame(()=>{ try{ this.drawWhere(); }catch(e){} }); }
+    }catch(e){}
+  }
+
+  waitForThree(tries){
+    if(window.THREE && window.THREE.OrbitControls){ this.initThree(); return; }
+    if(tries>120) return;
+    setTimeout(()=>this.waitForThree(tries+1),50);
+  }
+
+  // ---------- refs ----------
+  setMount=(el)=>{ this.mount=el; };
+  setDive=(el)=>{ this.diveEl=el; };
+  setLoad=(el)=>{ this.loadEl=el; };
+  setMapInner=(el)=>{ this.mapInner=el; if(el) this.applyMapTransform(); };
+  setMapView=(el)=>{ if(!el) return; this.mapView=el; this.attachMapPan(el); };
+  setScratch=(el)=>{ if(el){ this.scratchCanvas=el; requestAnimationFrame(()=>this.initScratch()); } };
+  setMapCanvas=(el)=>{ this.mapCanvas=el; if(el&&this.mapReady) this.drawAtlas(); };
+  setWhere=(el)=>{ this.whereCanvas=el; if(el&&this.mapReady) requestAnimationFrame(()=>this.drawWhere()); };
+  setLabelCanvas=(el)=>{ this.labelCanvas=el; if(el&&this.mapReady) requestAnimationFrame(()=>this.renderLabels()); };
+  setTip=(el)=>{ this.tipEl=el; };
+  setTipFlag=(el)=>{ this.tipFlag=el; };
+  setTipName=(el)=>{ this.tipName=el; };
+  setTipSub=(el)=>{ this.tipSub=el; };
+  setAtlas=(el)=>{ this.atlasEl=el; if(el) requestAnimationFrame(()=>this.applyMapTheme()); };
+  setConfetti=(el)=>{ this.confettiCanvas=el; };
+
+  // ---------- three ----------
+  initThree(){
+    const THREE=window.THREE;
+    const el=this.mount; if(!el) return;
+    const w=el.clientWidth||window.innerWidth, h=el.clientHeight||window.innerHeight;
+    const scene=new THREE.Scene();
+    const cam=new THREE.PerspectiveCamera(45,w/h,0.01,1000); cam.position.set(2.367,0.30,-0.634); cam.lookAt(0,0,0);
+    const renderer=new THREE.WebGLRenderer({antialias:true,alpha:true}); renderer.setSize(w,h); renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+    el.appendChild(renderer.domElement);
+    this.scene=scene; this.cam=cam; this.renderer=renderer;
+
+    scene.add(new THREE.AmbientLight(0x4a5578,0.9));
+    const sun=new THREE.DirectionalLight(0xffffff,1.25); sun.position.set(5,3,5); scene.add(sun);
+
+    // stars
+    const sg=new THREE.BufferGeometry(); const N=1400; const pos=new Float32Array(N*3);
+    for(let i=0;i<N;i++){ const r=40+Math.random()*40; const th=Math.random()*Math.PI*2; const ph=Math.acos(2*Math.random()-1); pos[i*3]=r*Math.sin(ph)*Math.cos(th); pos[i*3+1]=r*Math.sin(ph)*Math.sin(th); pos[i*3+2]=r*Math.cos(ph); }
+    sg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+    scene.add(new THREE.Points(sg,new THREE.PointsMaterial({color:0xffffff,size:0.18,sizeAttenuation:true})));
+
+    const loader=new THREE.TextureLoader(); loader.crossOrigin='anonymous';
+    const base='https://unpkg.com/three-globe/example/img/';
+    let loaded=0; const done=()=>{ loaded++; if(loaded>=1 && this.loadEl){ this.loadEl.style.transition='opacity .6s'; this.loadEl.style.opacity='0'; setTimeout(()=>{ if(this.loadEl) this.loadEl.style.display='none'; },650); } };
+    const dayTex=loader.load(base+'earth-blue-marble.jpg',done);
+    const bumpTex=loader.load(base+'earth-topology.png');
+    const nightTex=loader.load(base+'earth-night.jpg');
+    const cloudTex=loader.load('https://cdn.jsdelivr.net/gh/turban/webgl-earth@master/images/fair_clouds_4k.png', undefined, undefined, ()=>{ if(this.clouds) this.clouds.visible=false; });
+
+    const geo=new THREE.SphereGeometry(1,64,64);
+    this.dayMat=new THREE.MeshPhongMaterial({map:dayTex,bumpMap:bumpTex,bumpScale:0.018,specular:new THREE.Color(0x223344),shininess:8});
+    this.nightMat=new THREE.MeshPhongMaterial({map:nightTex,emissiveMap:nightTex,emissive:new THREE.Color(0xffffff),emissiveIntensity:1.1,specular:new THREE.Color(0x000000),shininess:2});
+    const globe=new THREE.Mesh(geo,this.dayMat); scene.add(globe); this.globe=globe;
+
+    const clouds=new THREE.Mesh(new THREE.SphereGeometry(1.012,64,64), new THREE.MeshPhongMaterial({map:cloudTex,transparent:true,opacity:0.4,depthWrite:false}));
+    scene.add(clouds); this.clouds=clouds;
+
+    const glow=new THREE.Mesh(new THREE.SphereGeometry(1.2,48,48), new THREE.MeshBasicMaterial({color:0x2ec4b6,transparent:true,opacity:0.16,side:THREE.BackSide,blending:THREE.AdditiveBlending}));
+    scene.add(glow);
+
+    const controls=new THREE.OrbitControls(cam,renderer.domElement);
+    controls.enableDamping=true; controls.dampingFactor=0.08; controls.enablePan=false;
+    controls.minDistance=1.35; controls.maxDistance=4.5; controls.autoRotate=true; controls.autoRotateSpeed=0.45; controls.rotateSpeed=0.5;
+    this.controls=controls;
+
+    this.makeScavenger();
+    this.attachGlobePointer(renderer.domElement);
+    this.raycaster=new THREE.Raycaster();
+    this.diving=false; this.diveT=0;
+    this.animate();
+  }
+
+  makeScavenger(){
+    // hidden-object sprites removed — kept as a no-op to avoid distracting floaters
+    this.scav=[];
+  }
+
+  attachGlobePointer(dom){
+    let sx=0,sy=0,moved=false;
+    dom.addEventListener('pointerdown',(e)=>{ sx=e.clientX; sy=e.clientY; moved=false; });
+    dom.addEventListener('pointermove',(e)=>{ if(Math.abs(e.clientX-sx)>6||Math.abs(e.clientY-sy)>6) moved=true; });
+    dom.addEventListener('pointerup',(e)=>{ if(moved||this.diving||this.state.phase!=='globe') return; this.handleGlobeClick(e); });
+  }
+  handleGlobeClick(e){
+    const THREE=window.THREE; const rect=this.renderer.domElement.getBoundingClientRect();
+    const m=new THREE.Vector2(((e.clientX-rect.left)/rect.width)*2-1, -((e.clientY-rect.top)/rect.height)*2+1);
+    this.raycaster.setFromCamera(m,this.cam);
+    const sh=this.raycaster.intersectObjects(this.scav,false);
+    if(sh.length){ this.openSecret(sh[0].object.userData.secret); return; }
+    const gh=this.raycaster.intersectObject(this.globe,false);
+    if(gh.length){ this.startDive(gh[0]); }
+  }
+  startDive(hit){
+    const dir=hit.point.clone().normalize();
+    this.whoosh();
+    this.diving=true; this.diveT=0; this.diveDir=dir; this.controls.enabled=false; this.controls.autoRotate=false;
+    this.diveFrom=this.cam.position.clone();
+    // use the texture UV at the clicked point — this matches the 2D atlas exactly
+    const lng=hit.uv.x*360-180; const lat=hit.uv.y*180-90;
+    this._pendingCenter={lat,lng};
+  }
+  vecToLatLng(v){ const lat=90-Math.acos(v.y)*180/Math.PI; const lng=((Math.atan2(v.z,-v.x)*180/Math.PI)+180)%360-180; return {lat,lng:-lng}; }
+
+  animate(){
+    this._raf=requestAnimationFrame(()=>this.animate());
+    const now=performance.now()/1000;
+    if(this.clouds) this.clouds.rotation.y+=0.00045;
+    if(this.scav){ this.scav.forEach(sp=>{ const u=sp.userData; const a=u.a+now*u.speed; sp.position.set(Math.cos(a)*u.r, Math.sin(now*0.5+u.a)*0.35+u.tilt*0.3, Math.sin(a)*u.r); }); }
+    if(this.diving){
+      this.diveT=Math.min(1,this.diveT+0.022);
+      const e=this.diveT*this.diveT*(3-2*this.diveT);
+      const target=this.diveDir.clone().multiplyScalar(1.12);
+      this.cam.position.lerpVectors(this.diveFrom,target,e);
+      this.cam.lookAt(0,0,0);
+      if(this.diveEl) this.diveEl.style.opacity=String(Math.min(1,e*1.3));
+      if(this.diveT>=1){ this.diving=false; this.setState({phase:'atlas'}); setTimeout(()=>{ this.cam.position.set(0,0.4,3.2); this.controls.autoRotate=true; if(this.diveEl){ this.diveEl.style.transition='opacity .5s'; this.diveEl.style.opacity='0'; setTimeout(()=>{ if(this.diveEl) this.diveEl.style.transition=''; },550);} },400); }
+    } else if(this.controls){ this.controls.update(); }
+    if(this.renderer) this.renderer.render(this.scene,this.cam);
+  }
+  onResize(){ if(this.renderer&&this.mount){ const w=this.mount.clientWidth||window.innerWidth, h=this.mount.clientHeight||window.innerHeight; this.cam.aspect=w/h; this.cam.updateProjectionMatrix(); this.renderer.setSize(w,h); } if(this.state.phase==='atlas'){ this.clampMap(); this.applyMapTransform(); } }
+
+  // ---------- atlas pan / zoom / hover / click ----------
+  attachMapPan(view){
+    let dragging=false,lx=0,ly=0,downX=0,downY=0,moved=false;
+    view.addEventListener('pointerdown',(e)=>{ dragging=true; moved=false; lx=downX=e.clientX; ly=downY=e.clientY; view.style.cursor='grabbing'; this.hideTip(); });
+    window.addEventListener('pointermove',this._mapMove=(e)=>{
+      if(dragging){ this.mapX+=e.clientX-lx; this.mapY+=e.clientY-ly; lx=e.clientX; ly=e.clientY; if(Math.abs(e.clientX-downX)>4||Math.abs(e.clientY-downY)>4) moved=true; this.clampMap(); this.applyMapTransform(); return; }
+      if(this.state.phase==='atlas') this.handleHover(e);
+    });
+    window.addEventListener('pointerup',this._mapUp=(e)=>{ if(dragging){ dragging=false; if(this.mapView) this.mapView.style.cursor='grab'; if(!moved && this.state.phase==='atlas') this.handleMapClick(e); } });
+    view.addEventListener('wheel',(e)=>{ e.preventDefault(); const r=view.getBoundingClientRect(); this.zoomAt(e.clientX-r.left, e.clientY-r.top, e.deltaY<0?1.18:0.85); },{passive:false});
+  }
+  zoomAt(cx,cy,factor){ const old=this.mapScale; this.mapScale=Math.max(0.85,Math.min(7,this.mapScale*factor)); const k=this.mapScale/old; this.mapX=cx-(cx-this.mapX)*k; this.mapY=cy-(cy-this.mapY)*k; this.clampMap(); this.applyMapTransform(); }
+  zoomIn=()=>{ const r=this.mapView.getBoundingClientRect(); this.zoomAt(r.width/2,r.height/2,1.4); };
+  zoomOut=()=>{ const r=this.mapView.getBoundingClientRect(); this.zoomAt(r.width/2,r.height/2,1/1.4); };
+  handleHover(e){
+    if(this.state.quiz && this.state.quiz.active){ this.hideTip(); if(this.mapView) this.mapView.style.cursor='crosshair'; return; }
+    const r=this.mapView.getBoundingClientRect(); const g=this.screenToGeo(e.clientX-r.left, e.clientY-r.top);
+    const f=this.featureAt(g.lng,g.lat);
+    if(f!==this.hoverFeature){ this.hoverFeature=f; this.mapView.style.cursor=f?'pointer':'grab'; this.scheduleLabels(); }
+    if(f&&f.__country){ this.showTip(f.__country, e.clientX-r.left, e.clientY-r.top); } else this.hideTip();
+  }
+  showTip(c,x,y){ const t=this.tipEl; if(!t) return; if(this.tipFlag) this.tipFlag.textContent=c.flag; if(this.tipName) this.tipName.textContent=c.name; if(this.tipSub) this.tipSub.textContent='● '+c.capital+'  ·  tap to explore'; t.style.display='block'; const r=this.mapView.getBoundingClientRect(); let lx=x+16, ly=y+16; if(lx+180>r.width) lx=x-180; t.style.left=lx+'px'; t.style.top=ly+'px'; }
+  hideTip(){ if(this.tipEl) this.tipEl.style.display='none'; }
+  handleMapClick(e){
+    const r=this.mapView.getBoundingClientRect(); const sx=e.clientX-r.left, sy=e.clientY-r.top;
+    const g=this.screenToGeo(sx,sy); const f=this.featureAt(g.lng,g.lat);
+    if(this.state.quiz && this.state.quiz.active){ this.checkAnswer(f,sx,sy); return; }
+    for(const p of this.placedLabels){ if(sx>=p.x-3&&sx<=p.x+p.w+3&&sy>=p.y-3&&sy<=p.y+p.h+3){ this.selectCountry(p.country); return; } }
+    if(f&&f.__country) this.selectCountry(f.__country);
+  }
+  // ---------- quiz ----------
+  centerWorld(){ if(!this.mapView) return; const r=this.mapView.getBoundingClientRect(); this.mapScale=Math.max(0.85,Math.min(1.3, r.width/1400)); this.mapX=(r.width-1400*this.mapScale)/2; this.mapY=(r.height-700*this.mapScale)/2; this.clampMap(); this.applyMapTransform(); }
+  startQuiz=()=>{
+    const pool=this.COUNTRIES.filter(c=>c.rank<=2 && this.clickable.some(f=>f.__country===c));
+    for(let i=pool.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=pool[i]; pool[i]=pool[j]; pool[j]=t; }
+    const picks=pool.slice(0,8);
+    this.hoverFeature=null; this.stopClock();
+    this.setState({ selected:null, quiz:{ active:true, pool:picks, idx:0, curWrong:0, score:0, message:'', msgColor:'#cdd4f5', done:false } }, ()=>{ this.centerWorld(); this.renderLabels(); });
+  };
+  quitQuiz=()=>{ this.setState({ quiz:null }, ()=>{ this.renderLabels(); }); };
+  checkAnswer(f,sx,sy){
+    const q=this.state.quiz; if(!q||q.done) return; const target=q.pool[q.idx];
+    if(f && f.__country===target){
+      this.cheer(); this.fireConfetti(sx,sy);
+      const firstTry=q.curWrong===0; const score=q.score+(firstTry?1:0);
+      const nq={ ...q, score, message:'🎉 Yes! That’s '+target.name+'!', msgColor:'#7fe3d3' };
+      this.hoverFeature=f; this.setState({ quiz:nq }, ()=>this.renderLabels());
+      setTimeout(()=>this.nextQuestion(), 1500);
+    } else {
+      this.buzz(); const got=f&&f.__country;
+      const curWrong=q.curWrong+1;
+      let msg = got ? '❌ That’s '+got.name+'. ' : '❌ Not there. ';
+      msg += curWrong>=2 ? ('Hint: capital is '+target.capital+'.') : ('Hint: it’s in '+target.region+'.');
+      this.setState({ quiz:{ ...q, curWrong, message:msg, msgColor:'#ff8a8a' } });
+    }
+  }
+  nextQuestion(){
+    const q=this.state.quiz; if(!q) return; this.hoverFeature=null;
+    if(q.idx+1>=q.pool.length){ this.setState({ quiz:{ ...q, done:true } }, ()=>this.renderLabels()); }
+    else { this.setState({ quiz:{ ...q, idx:q.idx+1, curWrong:0, message:'', msgColor:'#cdd4f5' } }, ()=>this.renderLabels()); }
+  }
+  fireConfetti(x,y){
+    const cv=this.confettiCanvas; if(!cv||!this.mapView) return; const r=this.mapView.getBoundingClientRect(); const dpr=Math.min(devicePixelRatio||1,2);
+    cv.width=r.width*dpr; cv.height=r.height*dpr; const ctx=cv.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0);
+    const ox=(x==null?r.width/2:x), oy=(y==null?r.height/2:y);
+    const cols=['#ffd23f','#ff6b6b','#2ec4b6','#5b8def','#b96bff','#ffffff'];
+    const P=[]; for(let i=0;i<130;i++){ const a=Math.random()*Math.PI*2, sp=3+Math.random()*8; P.push({ x:ox, y:oy, vx:Math.cos(a)*sp, vy:Math.sin(a)*sp-4, g:0.18+Math.random()*0.12, s:4+Math.random()*5, rot:Math.random()*6.28, vr:(Math.random()-0.5)*0.3, c:cols[i%cols.length], life:1 }); }
+    if(this._confRaf) cancelAnimationFrame(this._confRaf);
+    const start=performance.now();
+    const step=(now)=>{ const t=(now-start)/1000; ctx.clearRect(0,0,r.width,r.height); let alive=false;
+      P.forEach(p=>{ p.vy+=p.g; p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr; p.life=Math.max(0,1-t/1.8); if(p.life>0&&p.y<r.height+20){ alive=true; ctx.save(); ctx.globalAlpha=p.life; ctx.translate(p.x,p.y); ctx.rotate(p.rot); ctx.fillStyle=p.c; ctx.fillRect(-p.s/2,-p.s/2,p.s,p.s*0.6); ctx.restore(); } });
+      if(alive&&t<2) this._confRaf=requestAnimationFrame(step); else ctx.clearRect(0,0,r.width,r.height);
+    };
+    this._confRaf=requestAnimationFrame(step);
+  }
+  // ---------- live clock ----------
+  clockNow(tz, capLng){
+    const now=new Date();
+    // fallback if no IANA zone: approximate from longitude
+    if(!tz){
+      const utcMs=now.getTime()+(now.getTimezoneOffset()*60000);
+      const d=new Date(utcMs+(capLng/15)*3600000); const hh=d.getHours(), mm=d.getMinutes();
+      const off=Math.round(capLng/15);
+      return { localTime:(hh<10?'0':'')+hh+':'+(mm<10?'0':'')+mm, isDay:hh>=6&&hh<19, tzLabel:'UTC'+(off>=0?'+':'')+off+' (approx.)' };
+    }
+    try{
+      const parts=new Intl.DateTimeFormat('en-GB',{timeZone:tz,hour:'2-digit',minute:'2-digit',hour12:false}).formatToParts(now);
+      let hh=parseInt(parts.find(p=>p.type==='hour').value,10); if(hh===24) hh=0;
+      const mm=parts.find(p=>p.type==='minute').value;
+      const localTime=(hh<10?'0':'')+hh+':'+mm;
+      const isDay=hh>=6&&hh<19;
+      let off='';
+      try{ off=(new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'shortOffset'}).formatToParts(now).find(p=>p.type==='timeZoneName')||{}).value||''; }catch(e){}
+      let abbr='';
+      try{ abbr=(new Intl.DateTimeFormat('en-US',{timeZone:tz,timeZoneName:'short'}).formatToParts(now).find(p=>p.type==='timeZoneName')||{}).value||''; }catch(e){}
+      let utc=off.replace('GMT','UTC'); if(utc==='UTC') utc='UTC+0';
+      const isPlainOffset=/^(GMT|UTC)/.test(abbr) || abbr===off || !abbr;
+      const tzLabel=isPlainOffset ? utc : (abbr+' · '+utc);
+      return { localTime, isDay, tzLabel };
+    }catch(e){
+      return this.clockNow(null, capLng);
+    }
+  }
+  startClock(){ this.stopClock(); this._clock=setInterval(()=>{ if(this.state.selected) this.setState(s=>({clockTick:s.clockTick+1})); }, 1000); }
+  stopClock(){ if(this._clock){ clearInterval(this._clock); this._clock=null; } }
+  clampMap(){ if(!this.mapView) return; const r=this.mapView.getBoundingClientRect(); const W=1400*this.mapScale, H=700*this.mapScale; this.mapX = W<=r.width ? (r.width-W)/2 : Math.min(0,Math.max(r.width-W,this.mapX)); this.mapY = H<=r.height ? (r.height-H)/2 : Math.min(0,Math.max(r.height-H,this.mapY)); }
+  applyMapTransform(){ if(this.mapInner) this.mapInner.style.transform='translate('+this.mapX+'px,'+this.mapY+'px) scale('+this.mapScale+')'; this.scheduleLabels(); }
+  centerMap(lat,lng){ if(!this.mapView) return; const r=this.mapView.getBoundingClientRect(); this.mapScale=2.0; const px=(lng+180)/360*1400, py=(90-lat)/180*700; this.mapX=r.width/2-px*this.mapScale; this.mapY=r.height/2-py*this.mapScale; this.clampMap(); this.applyMapTransform(); }
+
+  // ---------- interactions ----------
+  toggleNight=()=>{ const night=!this.state.night; this.setState({night}); if(this.globe) this.globe.material= night?this.nightMat:this.dayMat; };
+  backToGlobe=()=>{ this.setState({phase:'globe',selected:null}); if(this.controls){ this.controls.enabled=true; this.controls.autoRotate=true; } };
+  selectCountry=(c)=>{
+    const visited=this.state.visited.slice(); let fresh=false;
+    if(visited.indexOf(c.name)<0){ visited.push(c.name); fresh=true; try{ localStorage.setItem('gx_passport',JSON.stringify(visited)); }catch(e){} }
+    this.setState({selected:c,visited,scratchDone:false});
+    if(fresh){ this.stamp(); }
+    this.startClock();
+  };
+  closeCountry=()=>{ this.stopClock(); this.setState({selected:null}); };
+  openSecret=(s)=>{ this.ding(); this.setState({secret:s}); };
+  closeSecret=()=>this.setState({secret:null});
+  stop=(e)=>{ e.stopPropagation(); };
+
+  // ---------- scratch ----------
+  initScratch(){
+    const cv=this.scratchCanvas; if(!cv) return;
+    const w=cv.clientWidth||280, h=cv.clientHeight||118; cv.width=w; cv.height=h;
+    const ctx=cv.getContext('2d');
+    ctx.fillStyle='#5b6299'; ctx.fillRect(0,0,w,h);
+    ctx.fillStyle='rgba(255,255,255,.08)'; for(let i=-h;i<w;i+=14){ ctx.fillRect(i,0,7,h); }
+    ctx.fillStyle='#cdd4f5'; ctx.font='700 13px Fredoka, sans-serif'; ctx.textAlign='center'; ctx.fillText('✦ Scratch to reveal ✦',w/2,h/2);
+    this._scratching=false; this._revealed=false;
+    const erase=(x,y)=>{ ctx.globalCompositeOperation='destination-out'; ctx.beginPath(); ctx.arc(x,y,20,0,Math.PI*2); ctx.fill(); };
+    const pos=(e)=>{ const r=cv.getBoundingClientRect(); const t=e.touches?e.touches[0]:e; return {x:(t.clientX-r.left)*(cv.width/r.width), y:(t.clientY-r.top)*(cv.height/r.height)}; };
+    const check=()=>{ const d=ctx.getImageData(0,0,w,h).data; let clear=0; for(let i=3;i<d.length;i+=32){ if(d[i]===0) clear++; } if(clear/(d.length/32)>0.5 && !this._revealed){ this._revealed=true; ctx.clearRect(0,0,w,h); this.ding(); this.setState({scratchDone:true}); } };
+    const move=(e)=>{ if(!this._scratching) return; e.preventDefault(); const p=pos(e); erase(p.x,p.y); };
+    cv.onpointerdown=(e)=>{ this._scratching=true; const p=pos(e); erase(p.x,p.y); };
+    cv.onpointermove=move;
+    window.addEventListener('pointerup',this._scratchUp=()=>{ if(this._scratching){ this._scratching=false; check(); } });
+  }
+
+  // ---------- render ----------
+  renderVals(){
+    const s=this.state; const total=s.total||this.COUNTRIES.length||1;
+    const byName={}; this.COUNTRIES.forEach(c=>{ byName[c.name]=c; });
+    const slots=s.visited.map(n=>{ const c=byName[n]; return { flag:c?c.flag:'🏳️', border:'2px solid #ffd23f', bg:'rgba(255,210,63,.14)' }; });
+    let sel=null;
+    if(s.selected){ const c=s.selected;
+      const hemi=c.capLat>=0?'🧭 Northern half':'🧭 Southern half';
+      const eqKm=Math.round(Math.abs(c.capLat)*111);
+      const eqLine='About '+eqKm.toLocaleString()+' km from the Equator';
+      const t=this.clockNow(c.tz, c.capLng);
+      sel={ name:c.name, flag:c.flag, region:c.region, capital:c.capital, fact:c.fact,
+        hemi, eqLine, localTime:t.localTime, tzLabel:t.tzLabel, dayIcon:t.isDay?'☀️':'🌙', dayLabel:t.isDay?'Daytime':'Night-time',
+        sunLine:t.isDay?('The Sun is shining in '+c.capital+' right now!'):('It’s dark in '+c.capital+' — the stars are out.') };
+    }
+    const q=s.quiz; const quizActive=!!(q&&q.active); const inQuiz=quizActive&&!q.done;
+    const qt=quizActive?q.pool[q.idx]:null;
+    const score=q?q.score:0;
+    return {
+      isAtlas: s.phase==='atlas',
+      hintDisplay: s.phase==='globe'?'flex':'none',
+      backDisplay: s.phase==='atlas'?'flex':'none',
+      night: s.night,
+      nightLabel: s.night?'☀️ Day':'🌙 Night',
+      nightTrack: s.night?'#2ec4b6':'rgba(255,255,255,.2)',
+      nightKnob: s.night?'18px':'2px',
+      toggleNight: this.toggleNight,
+      backToGlobe: this.backToGlobe,
+      zoomIn: this.zoomIn, zoomOut: this.zoomOut,
+      toggleMapTheme: this.toggleMapTheme,
+      mapThemeLabel: s.mapTheme==='day'?'🌙 Night map':'☀️ Day map',
+      setAtlas: this.setAtlas, setConfetti: this.setConfetti,
+      startQuiz: this.startQuiz, quitQuiz: this.quitQuiz,
+      quizBtnDisplay: (s.phase==='atlas'&&!quizActive)?'flex':'none',
+      exploreHelpDisplay: quizActive?'none':'block',
+      quizHudDisplay: inQuiz?'block':'none',
+      quizNum: q?(q.idx+1):0, quizTotal: q?q.pool.length:8, quizScore: score,
+      quizTarget: qt?qt.name:'', quizFlag: qt?qt.flag:'',
+      quizMessage: q?q.message:'', quizMsgColor: q?q.msgColor:'#cdd4f5',
+      quizDone: !!(q&&q.done),
+      quizMedal: score>=7?'🏆':score>=4?'🥈':'🌍',
+      quizFinalTitle: score>=7?'Geography Star!':score>=4?'Great exploring!':'Keep exploring!',
+      slots, total,
+      emptyDisplay: s.visited.length?'none':'block',
+      visitedCount: s.visited.length,
+      progressW: Math.round(s.visited.length/total*100)+'%',
+      hasSelected: !!s.selected, sel,
+      scratchHint: s.scratchDone?'🎉 Nice scratching!':'Drag across the box to reveal the fact',
+      closeCountry: this.closeCountry, stop:this.stop,
+      hasSecret: !!s.secret, secret: s.secret||{emoji:'',text:''}, closeSecret:this.closeSecret,
+      setMount:this.setMount, setDive:this.setDive, setLoad:this.setLoad, setMapInner:this.setMapInner, setMapView:this.setMapView, setScratch:this.setScratch, setMapCanvas:this.setMapCanvas, setWhere:this.setWhere, setLabelCanvas:this.setLabelCanvas, setTip:this.setTip, setTipFlag:this.setTipFlag, setTipName:this.setTipName, setTipSub:this.setTipSub
+    };
+  }
+}
+</script>
+</body>
+</html>
